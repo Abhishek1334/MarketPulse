@@ -12,8 +12,6 @@ export const router = createBrowserRouter([
 		path: "/",
 		element: <App />,
 		children: [
-			{element:<Layout/>,
-			children: [
 			{
 				path: "login",
 				element: <LoginPage />,
@@ -21,16 +19,12 @@ export const router = createBrowserRouter([
 			{
 				path: "register",
 				element: <RegisterPage />,
-			}
-			]
 			},
-			
-
 			{
-				element: <ProtectedRoute />, 
+				element: <ProtectedRoute />, // Protect the routes that require authentication
 				children: [
 					{
-						element: <Layout />, 
+						element: <Layout />, // Layout for the dashboard and watchlist pages
 						children: [
 							{
 								path: "dashboard",

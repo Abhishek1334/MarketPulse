@@ -12,7 +12,7 @@ function App() {
 	}, []);
 
 	return (
-		<div className="bg-[var(--background-50)]  min-h-screen">
+		<div className="bg-[var(--background-50)]  min-h-screen transition-all duration-500 ease-in-out">
 			<ToastContainer
 				transition={Slide}
 				position="top-right"

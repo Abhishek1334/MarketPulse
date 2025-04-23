@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getASingleWatchlist } from "@/api/watchlist";
 import { showError, showSuccess } from "@/utils/toast";
-import moment from "moment";
 import { getStockDatafromExternalAPI } from "@/api/stock";
 import WatchlistHeader from "@/components/Watchlist/WatchlistHeader";
 import StockList from "@/components/Watchlist/StockList";
 import StockPreviewBox from "@/components/Watchlist/StockPreviewBox";
+import { StepBack } from "lucide-react";
 
 const WatchlistPage = () => {
 	const { watchlistId } = useParams();
@@ -15,6 +15,8 @@ const WatchlistPage = () => {
 
 	const [previewStock, setPreviewStock] = useState(null);
 	const [previewStockData, setPreviewStockData] = useState(null);
+
+	const navigate = useNavigate();
 
 	const handlePreviewStock = (stock) => {
 		if (previewStock?._id === stock._id) return;
@@ -69,14 +71,21 @@ const WatchlistPage = () => {
 	}, [watchlistId]);
 
 	return (
-		<div className="min-h-screen p-15">
+		<div className="max-h-[90vh] px-10 py-6">
+			<div 
+				className="font-nunito text-[var(--text-950)] hover:text-[var(--text-600)] flex items-center gap-2 mb-2 cursor-pointer w-fit"
+				onClick={() => navigate("/dashboard")}
+			>
+				<StepBack size={26} onClick={() => window.history.back()} />
+				<div>Back to Watchlists</div>
+			</div>
 			<div className="grid grid-cols-3 grid-rows-[auto_1fr] gap-6">
 				{/* Header */}
 				<WatchlistHeader watchlistData={watchlistData} />
 
 				{/* Stocks Section */}
 				<StockList
-					watchlistData={watchlistData}
+					watchlistId={watchlistId}
 					loading={loading}
 					handlePreviewStock={handlePreviewStock}
 				/>

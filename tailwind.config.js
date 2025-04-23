@@ -6,12 +6,20 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				nunito: ["Nunito", "system-ui", "sans-serif"],
-				"nunito-italic": ["Nunito Italic", "system-ui", "sans-serif"],
-				raleway: ["Raleway", "system-ui", "sans-serif"],
-				"raleway-italic": ["Raleway Italic", "system-ui", "sans-serif"],
+				nunito: ["Nunito", "sans-serif"],
+				raleway: ["Raleway", "sans-serif"],
 			},
-
+			fontWeight: {
+				hairline: "100",
+				thin: "200",
+				light: "300",
+				normal: "400",
+				medium: "500",
+				semibold: "600",
+				bold: "700",
+				extrabold: "800",
+				black: "900",
+			},
 			colors: {
 				text: {
 					50: "var(--text-50)",

@@ -25,7 +25,7 @@ const Navbar = () => {
 		`nav-link ${isActive ? "nav-link-active" : ""}`;
 
 	return (
-		<div className="bg-white shadow-md px-10 max-sm:px-4">
+		<div className="bg-white shadow-md px-10 max-sm:px-4 ">
 			<div className="flex justify-between items-center p-4">
 				<NavLink to="/">
 					<h1 className="text-2xl font-bold ml-2">MarketPulse</h1>

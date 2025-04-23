@@ -12,16 +12,16 @@ export const getWatchlistsByUser = async () => {
 			throw new Error("User not authenticated.");
 		}
 
-		const response = await axios.get("/watchlist",{
+		const response = await axios.get("/watchlist", {
 			headers: {
-				"Authorization": `Bearer ${token}`,
+				Authorization: `Bearer ${token}`,
 			},
 		});
 		return response.data;
 	} catch (error) {
-		console.error("Error Response:", error.response.data);
+		console.error("Error Response:", error.response?.data || error.message);
 		throw new Error(
-			error.response.data.message ||
+			error.message ||
 				"Something went wrong with the server."
 		);
 	}

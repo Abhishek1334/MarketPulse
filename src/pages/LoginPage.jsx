@@ -3,15 +3,18 @@ import { useNavigate, Link } from "react-router-dom";
 import { LoginUser } from "../api/auth.js";
 import useStore from "../context/Store.js";
 import { showSuccess, showError } from "../utils/toast";
-
+import { Eye, EyeClosed } from "lucide-react";
 const LoginPage = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
+
 	const navigate = useNavigate();
 	const login = useStore((state) => state.login);
 	const user = useStore((state) => state.user);
 
+	
 	useEffect(() => {
 		if (user) navigate("/dashboard");
 	}, [user, navigate]);
@@ -61,8 +64,9 @@ const LoginPage = () => {
 						required
 						autoComplete="email"
 					/>
+					<div className="relative">
 					<input
-						type="password"
+						type={showPassword ? "text" : "password"}
 						name="password"
 						value={password}
 						placeholder="Password"
@@ -71,6 +75,10 @@ const LoginPage = () => {
 						required
 						autoComplete="current-password"
 					/>
+					<div className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-[var(--text-950)] transition-all duration-300 ease-in-out">
+					{showPassword ? <Eye size={20} onClick={() => setShowPassword(false)} /> : <EyeClosed size={20} onClick={() => setShowPassword(true)} />}
+					</div>
+					</div>
 					<button
 						type="submit"
 						className="modal-button"

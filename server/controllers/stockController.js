@@ -176,54 +176,31 @@ export const deleteStockFromWatchlist = async (req, res) => {
 	}
 
 }
-
-// PUT api/stock/watchlistId/stockId
-// for updating a stock in a specific watchlist
+// PUT api/stock/:watchlistId/:stockId
 export const updateStockinWatchlist = async (req, res) => {
-	try{
+	try {
 		const { watchlistId, stockId } = req.params;
-		const { symbol, note, targetPrice } = req.body;
-		const existing = await watchlist.findById(watchlistId);
+		const { note, targetPrice } = req.body;
 
-		if(!existing){
+		const existing = await watchlist.findById(watchlistId);
+		if (!existing) {
 			throw createError("Watchlist not found.", 404);
-		};
+		}
 
 		if (!checkOwnership(existing.user, req.user._id)) {
 			throw createError("Unauthorized", 403);
 		}
 
 		const stockToUpdate = existing.stocks.id(stockId);
-
-		if(!stockToUpdate){
+		if (!stockToUpdate) {
 			throw createError("Stock not found in watchlist.", 404);
 		}
 
-
-		// Check if stock already exists in watchlist
-		const existingStock = existing.stocks.find(
-			(stock) => stock.symbol === symbol
-		);
-
-		if (existingStock) {
-			throw createError(`Stock with symbol ${symbol} already exists in the watchlist`, 409);
-		}
-
-		const data = await validateStockSymbol(symbol);
-
-		if (!data || data.code || data.message || data.status === "error") {
-			throw createError("Invalid stock symbol.", 400);
-		}
-
-		if(symbol){
-			stockToUpdate.symbol = symbol.toUpperCase();
-		}
-
-		if(note){
+		if (note !== undefined) {
 			stockToUpdate.note = note;
 		}
 
-		if(targetPrice){
+		if (targetPrice !== undefined) {
 			stockToUpdate.targetPrice = targetPrice;
 		}
 
@@ -231,10 +208,10 @@ export const updateStockinWatchlist = async (req, res) => {
 
 		res.status(200).json({
 			message: "Stock updated in watchlist successfully.",
-			watchlist: existing,
+			stock: stockToUpdate,
 		});
-	}catch(error){
+	} catch (error) {
 		console.error("Error updating stock in watchlist:", error);
 		throw createError("Internal Server Error", 500);
 	}
-}
+};
