@@ -40,6 +40,49 @@ const useStore = create((set, get) => ({
 			watchlists: state.watchlists.filter((w) => w._id !== id),
 		})),
 
+	// ---- Stock Actions ----
+	addStockToWatchlist: (watchlistId, stock) =>
+		set((state) => ({
+			watchlists: state.watchlists.map((watchlist) =>
+				watchlist._id === watchlistId
+					? {
+							...watchlist,
+							stocks: [...watchlist.stocks, stock],
+					}
+					: watchlist
+			),
+		})),
+
+	updateStockInWatchlist: (watchlistId, stockSymbol, updatedStock) =>
+		set((state) => ({
+			watchlists: state.watchlists.map((watchlist) =>
+				watchlist._id === watchlistId
+					? {
+							...watchlist,
+							stocks: watchlist.stocks.map((stock) =>
+								stock.symbol === stockSymbol
+									? { ...stock, ...updatedStock }
+									: stock
+							),
+					}
+					: watchlist
+			),
+		})),
+
+	removeStockFromWatchlist: (watchlistId, stockSymbol) =>
+		set((state) => ({
+			watchlists: state.watchlists.map((watchlist) =>
+				watchlist._id === watchlistId
+					? {
+							...watchlist,
+							stocks: watchlist.stocks.filter(
+								(stock) => stock.symbol !== stockSymbol
+							),
+					}
+					: watchlist
+			),
+		})),
+
 	// ---- Theme State ----
 	theme: localStorage.getItem("theme") || "light",
 	setTheme: (theme) => {
@@ -61,16 +104,15 @@ export default useStore;
 
 
 // question : do i need to call setwatchlists after creating a new watchlist or deleting a watchlist
-// answer: yes
-
-// i create a watchlist and after successful create api call i call add watchlist , do i need to call setWatchlists after that ??
-// answer: yes
-
-// why ?
-// because i need to update the watchlists state
-
-// same for delete , i call deleteWatchlist api , do i need to call setWatchlists after that ?
-// answer: yes 
-
-// why ?
-// because i need to update the watchlists state
+// answer: no
+{
+	/* 
+	
+Action						Built-in state update?	Need to call setWatchlists?
+addWatchlist(newW)			✅ Yes					❌ No
+deleteWatchlist(id)			✅ Yes					❌ No
+Fetch all watchlists		❌ No					✅ Yes (setWatchlists(fetchedWatchlists)
+Update one item manually	❌ No					✅ Yes (setWatchlists(...))
+	
+	*/
+}

@@ -3,7 +3,7 @@ import moment from "moment";
 const StockPreview = ({ previewStock }) => {
 	return (
 		<div className="space-y-1 border-b-2 pb-4">
-			<h2 className="text-xl font-semibold text-[var(--text-950)] pb-2">
+			<h2 className="text-xl font-semibold text-[var(--text-950)] pb-2 transition-all duration-500 ease-in-out">
 				Stock Preview
 			</h2>
 			<div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">

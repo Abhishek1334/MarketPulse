@@ -7,34 +7,52 @@ import Watchlist from "../components/Dashboard/Watchlist.jsx";
 import { Plus } from "lucide-react";
 import CreateWatchlist from "../components/Dashboard/CreateWatchlist.jsx";
 import useStore from "@/context/Store";
+import { useQuery } from "@tanstack/react-query";
 
 const DashboardPage = () => {
-	const { setWatchlists, addWatchlist } =
+	const { setWatchlists } =
 		useStore();
 
-	const [loading, setLoading] = useState(true);
+	const {
+		data: watchlists,
+		isLoading,
+		isError,
+		error,
+	} = useQuery({
+		queryKey: ["watchlists"],
+		queryFn: getWatchlistsByUser,
+	})
 
 	const [showForm, setShowForm] = useState(false);
+
 	
 	useEffect(() => {
-		const fetchWatchlists = async () => {
-			try {
-				const fetchedWatchlists = await getWatchlistsByUser();
-				setWatchlists(fetchedWatchlists);
-			} catch (error) {
-				showError("Failed to fetch watchlists.");
-			}
-		};
-		fetchWatchlists();
-		setLoading(false);
-	}, []);
+		if(watchlists){
+			setWatchlists(watchlists)
+		}
+	}, [watchlists]);
 
 
+	useEffect(() => {
+		if (isError && error?.message) {
+			showError(error.message);
+		}
+	}, [isError, error]);
+
+	if (isError) {
+		return (
+			<div className="flex h-[90vh] items-center justify-center text-red-600 text-lg">
+				⚠️ {error.message}
+			</div>
+		);
+	}
+
+	
 	return (
-		<div className="p-15">
+		<div className="px-15 py-10">
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
 				<Header />
-				<SummaryCards loading={loading} />
+				<SummaryCards loading={isLoading} />
 			</div>
 			<div >
 				<div
@@ -51,7 +69,7 @@ const DashboardPage = () => {
 				)}
 
 				<Watchlist
-					loading={loading}
+					loading={isLoading}
 				/>
 			</div>
 			

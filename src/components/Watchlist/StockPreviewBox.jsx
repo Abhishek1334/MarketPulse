@@ -6,7 +6,7 @@ import { ListRestart } from 'lucide-react';
 
 const StockPreviewBox = ({ previewStock, previewStockData, setPreviewStock }) => {
 	return (
-	<div className="col-span-1 bg-[var(--secondary-100)] shadow-sm rounded-xl px-4 py-4 border border-[var(--accent-200)] max-h-fit">
+	<div className="col-span-1 bg-[var(--secondary-100)] shadow-sm rounded-xl px-4 py-4 border border-[var(--accent-200)] max-h-fit transition-all duration-500 ease-in-out min-h-fit">
 		{previewStock && <div>
 			<ListRestart
 				className="cursor-pointer place-self-end mb-4 mr-2"

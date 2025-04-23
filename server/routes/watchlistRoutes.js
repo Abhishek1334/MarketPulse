@@ -55,15 +55,15 @@ router.post("/:watchlistId/stock", addStockToWatchlist);
 
 // @route   POST /api/watchlist/:watchlistId/stocks
 // @desc    Add multiple stocks to a specific watchlist
-router.post("/:watchlistId/stocks", addMultipleStocksToWatchlist);
+router.post("/:watchlistId/stock", addMultipleStocksToWatchlist);
 
 
 // @route   DELETE /api/watchlist/:watchlistId/stocks/:stockId
 // @desc    Remove a stock from a specific watchlist
-router.delete("/:watchlistId/stocks/:stockId", deleteStockFromWatchlist);
+router.delete("/:watchlistId/stock/:stockId", deleteStockFromWatchlist);
 
 // @route   PUT /api/watchlist/:watchlistId/stocks/:stockId
 // @desc    Update a stock inside a specific watchlist
-router.put("/:watchlistId/stocks/:stockId", updateStockinWatchlist);
+router.put("/:watchlistId/stock/:stockId", updateStockinWatchlist);
 
 export default router;

@@ -1,14 +1,36 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
 import useStore from "../context/Store";
+import { Slide, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const ProtectedRoute = () => {
-	const user = useStore((state) => state.user);
+function App() {
+	const initializeUser = useStore((state) => state.initializeUser);
+	const [isUserInitialized, setIsUserInitialized] = useState(false);
 
-	if (!user) {
-		return <Navigate to="/login" replace />;
+	useEffect(() => {
+		initializeUser();
+		setIsUserInitialized(true); 
+	}, [initializeUser]);
+
+	if (!isUserInitialized) {
+		return <div>Loading...</div>; 
 	}
 
-	return <Outlet />;
-};
+	return (
+		<div className="bg-[var(--background-50)] min-h-screen transition-all duration-500 ease-in-out">
+			<ToastContainer
+				transition={Slide}
+				position="top-right"
+				autoClose={2500}
+				theme="light"
+				closeOnClick
+				draggable
+			/>
 
-export default ProtectedRoute;
+			<Outlet />
+		</div>
+	);
+}
+
+export default App;
