@@ -128,7 +128,7 @@ export default function AddStockModal({ watchlistId }) {
 						}
 						className="modal-inputField"
 						required
-						ref={(ref) => ref && isEditing && ref.focus()}
+						autoFocus
 					/>
 					<input
 						type="text"

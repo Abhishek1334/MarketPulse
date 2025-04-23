@@ -4,6 +4,8 @@ import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import DashboardPage from "../pages/DashboardPage";
 import WatchlistPage from "../pages/WatchlistPage";
+import AnalyticsPage from "../pages/AnalyticsPage";
+import TestRateLimit from "../pages/TestRateLimit";
 import ProtectedRoute from "./ProtectedRoute";
 import Layout from "../components/Layout";
 
@@ -34,6 +36,14 @@ export const router = createBrowserRouter([
 								path: "watchlist/:watchlistId",
 								element: <WatchlistPage />,
 							},
+							{
+								path: "watchlist/:watchlistId/analytics/:stockId",
+								element: <AnalyticsPage />,
+							}
+							// {
+							// 	path:"test-rate-limit",
+							// 	element:<TestRateLimit/>
+							// }
 						],
 					},
 				],

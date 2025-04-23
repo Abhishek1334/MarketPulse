@@ -29,7 +29,7 @@ app.use("/api/auth", authRoutes);
 
 // Watchlist Routes (Protected)
 app.use("/api/watchlist", authMiddleware, watchlistRoutes);
-app.use("/api/stock", stocksRoutes);
+app.use("/api/stock", authMiddleware, stocksRoutes);
 
 app.use(errorHandler);
 

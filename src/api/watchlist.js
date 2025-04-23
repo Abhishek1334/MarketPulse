@@ -3,10 +3,10 @@ import axios from "./axiosInstance.js";
 
 export const getWatchlistsByUser = async () => {
 	try {
-		// Get the token from localStorage
-		const storedUser = localStorage.getItem("authUser");
-		const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-		const token = parsedUser?.token;
+		// Get the token from localStorage using the correct key
+		const storedState = localStorage.getItem("stock-dashboard-store");
+		const parsedState = storedState ? JSON.parse(storedState) : null;
+		const token = parsedState?.state?.user?.token;
 
 		if (!token) {
 			throw new Error("User not authenticated.");
@@ -28,40 +28,39 @@ export const getWatchlistsByUser = async () => {
 };
 
 export const getASingleWatchlist = async (watchlistId) => {
-
 	if (!watchlistId) {
 		throw new Error("Missing required parameters : watchlistId");
 	}
+	const storedState = localStorage.getItem("stock-dashboard-store");
+	const parsedState = storedState ? JSON.parse(storedState) : null;
+	const token = parsedState?.state?.user?.token;
 
-	const storedUser = localStorage.getItem("authUser");
-	const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-	const token = parsedUser?.token;
-
-	if(!token){
+	if (!token) {
 		throw new Error("User not authenticated.");
 	}
 
-	try{
+	try {
 		const response = await axios.get(`/watchlist/${watchlistId}`, {
 			headers: {
-				"Authorization": `Bearer ${token}`,
+				Authorization: `Bearer ${token}`,
 			},
 		});
 		return response.data;
 	} catch (error) {
 		console.error("Error Response:", error.response.data);
-		throw new Error(error.response.data.message || "Something went wrong with the server.");
+		throw new Error(
+			error.response.data.message ||
+				"Something went wrong with the server."
+		);
 	}
-	
 };
 
 
 export const CreateAWatchlist = async (name , stocks) => {
 	try {
-		const storedUser = localStorage.getItem("authUser");
-		const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-		const token = parsedUser?.token;
-
+		const storedState = localStorage.getItem("stock-dashboard-store");
+		const parsedState = storedState ? JSON.parse(storedState) : null;
+		const token = parsedState?.state?.user?.token;
 		if (!token) {
 			throw new Error("User not authenticated.");
 		}
@@ -89,9 +88,9 @@ export const CreateAWatchlist = async (name , stocks) => {
 
 export const updateWatchlistName = async (watchlistId, newName) => {
 	try {
-		const storedUser = localStorage.getItem("authUser");
-		const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-		const token = parsedUser?.token;
+		const storedState = localStorage.getItem("stock-dashboard-store");
+		const parsedState = storedState ? JSON.parse(storedState) : null;
+		const token = parsedState?.state?.user?.token;
 
 		if (!token) {
 			throw new Error("User not authenticated.");
@@ -118,9 +117,9 @@ export const updateWatchlistName = async (watchlistId, newName) => {
 
 export const DeleteAWatchlist = async (watchlistId) => {
 	try {
-		const storedUser = localStorage.getItem("authUser");
-		const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-		const token = parsedUser?.token;
+		const storedState = localStorage.getItem("stock-dashboard-store");
+		const parsedState = storedState ? JSON.parse(storedState) : null;
+		const token = parsedState?.state?.user?.token;
 
 		if (!token) {
 			throw new Error("User not authenticated.");

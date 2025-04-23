@@ -74,7 +74,7 @@ export const addStockToWatchlist = async (req, res, next) => {
 		});
 	} catch (error) {
 		console.error("Error adding stock to watchlist:", error.message);
-		next(createError("Failed to add stock to watchlist.", 500));
+		next(createError(error.message || "Failed to add stock to watchlist.", 500));
 	}
 };
 

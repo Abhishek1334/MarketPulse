@@ -6,11 +6,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import ConfirmationModal from "../ConfirmationModal";
 import { showError, showSuccess } from "@/utils/toast";
 import EditModal from "../EditModal";
+import { useNavigate } from "react-router-dom";
 
 const StockCard = ({ stock, watchlistId, handlePreviewStock }) => {
 	const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 	const [isEditingModalOpen, setIsEditingModalOpen] = useState(false);
 	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 
 	const {
 		mutate: deleteMutate,
@@ -67,7 +69,6 @@ const StockCard = ({ stock, watchlistId, handlePreviewStock }) => {
 			setIsEditingModalOpen(false);
 		},
 	})
-	
 
 
 	const handleDeleteStock = () => {
@@ -75,6 +76,11 @@ const StockCard = ({ stock, watchlistId, handlePreviewStock }) => {
 	};
 
 	const handleEditStock = (note, targetPrice) => {
+		if(note === stock?.note && targetPrice === stock?.targetPrice){
+			setIsEditingModalOpen(false);
+			return
+		}
+
 		updateMutate({ watchlistId, stockId: stock._id, note, targetPrice });
 	}
 
@@ -102,7 +108,10 @@ const StockCard = ({ stock, watchlistId, handlePreviewStock }) => {
 				onEditCancel={() => setIsEditingModalOpen(false)}
 				isLoading={isUpdateQueryLoading}
 			/>
-			<div>
+			<div onClick={(e) => {
+				e.stopPropagation()
+				navigate(`/watchlist/${watchlistId}/analytics/${stock._id}`)				
+			}}>
 				<p className="font-semibold text-lg">{stock.symbol}</p>
 				<p className="text-xs text-[var(--text-600)]">
 					Added: {moment(stock.addedAt).format("MMM D, YYYY")}

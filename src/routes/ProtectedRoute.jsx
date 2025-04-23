@@ -1,36 +1,16 @@
-import { Outlet } from "react-router-dom";
-import { useEffect, useState } from "react";
-import useStore from "../context/Store";
-import { Slide, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { Navigate, Outlet } from "react-router-dom";
+import useStore from "@/context/Store";
 
-function App() {
-	const initializeUser = useStore((state) => state.initializeUser);
-	const [isUserInitialized, setIsUserInitialized] = useState(false);
+const ProtectedRoute = () => {
+	const user = useStore((state) => state.user);
+	const hasHydrated = useStore.persist.hasHydrated();
+	
 
-	useEffect(() => {
-		initializeUser();
-		setIsUserInitialized(true); 
-	}, [initializeUser]);
-
-	if (!isUserInitialized) {
-		return <div>Loading...</div>; 
+	if (!hasHydrated) {
+		return <div className="text-center py-20 text-xl">Loading...</div>;
 	}
 
-	return (
-		<div className="bg-[var(--background-50)] min-h-screen transition-all duration-500 ease-in-out">
-			<ToastContainer
-				transition={Slide}
-				position="top-right"
-				autoClose={2500}
-				theme="light"
-				closeOnClick
-				draggable
-			/>
+	return user ? <Outlet /> : <Navigate to="/login" />;
+};
 
-			<Outlet />
-		</div>
-	);
-}
-
-export default App;
+export default ProtectedRoute;
