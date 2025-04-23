@@ -7,15 +7,16 @@ import { updateWatchlistName } from "../../api/watchlist";
 import { showSuccess, showError } from "../../utils/toast";
 import { DeleteAWatchlist } from "../../api/watchlist";
 import ConfirmationModal from "@/components/ConfirmationModal";
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const WatchlistCard = ({ watchlist }) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const [watchlistName, setWatchlistName] = useState(watchlist.name);
-	const [isModalOpen, setIsModalOpen] = useState(false);	
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	const queryClient = useQueryClient();
 
+	// Mutations for updating and deleting the watchlist
 	const {
 		mutate: updateMutate,
 		isLoading: isUpdating,
@@ -54,20 +55,28 @@ const WatchlistCard = ({ watchlist }) => {
 		},
 	});
 
-
 	const navigate = useNavigate();
-	
+
 	const handleChange = (e) => {
 		setWatchlistName(e.target.value);
 	};
 
+	// Toggle editing state and reset name if canceling
 	const toggleEditing = () => {
 		setIsEditing((prev) => !prev);
-		setWatchlistName(watchlist.name);
+
+		// Reset the name to the original if canceling the edit
+		if (isEditing) {
+			setWatchlistName(watchlist.name); // Reset to original name
+		}
 	};
 
+	const handleCancelUpdate = (e) => {
+		e.preventDefault();
+		setIsEditing(false); // Stop editing and keep the original name
+		setWatchlistName(watchlist.name); // Reset to original name
+	};
 
-	
 	const handleDelete = () => {
 		setIsModalOpen(true);
 	};
@@ -76,27 +85,29 @@ const WatchlistCard = ({ watchlist }) => {
 		setIsModalOpen(false);
 	};
 
+	// Handle editing the watchlist name
 	const handleEditing = async (e) => {
-			e.preventDefault();
+		e.preventDefault();
 
-			if (!watchlistName.trim()) {
-				showError("Watchlist name is required.");
-				return;
-			}
+		if (!watchlistName.trim()) {
+			showError("Watchlist name is required.");
+			return;
+		}
 
-			if (watchlistName === watchlist.name) {
-				return;
-			}
+		if (watchlistName === watchlist.name) {
+			setIsEditing(false); // If no change, just stop editing
+			return;
+		}
 
-			setIsEditing(false);
+		setIsEditing(false);
 
-			try {
-				updateMutate(watchlistName);
-			} catch (error) {
-				console.error(error);
-				showError(error.message || "Something went wrong.");
-			}
-		};
+		try {
+			updateMutate(watchlistName);
+		} catch (error) {
+			console.error(error);
+			showError(error.message || "Something went wrong.");
+		}
+	};
 
 	const handleConfirmDelete = async () => {
 		try {
@@ -107,8 +118,6 @@ const WatchlistCard = ({ watchlist }) => {
 			showError(error.message || "Something went wrong.");
 		}
 	};
-
-	
 
 	const stocks = Array.isArray(watchlist.stocks) ? watchlist.stocks : [];
 
@@ -139,13 +148,9 @@ const WatchlistCard = ({ watchlist }) => {
 							onKeyDown={(e) =>
 								e.key === "Enter" && handleEditing(e)
 							}
-							onBlur={() => {
-								if (isEditing) {
-									handleEditing({ preventDefault: () => {} });
-								}
-							}}
 						/>
 						<button
+							type="submit"
 							className="bg-[var(--primary-500)] text-white rounded-md hover:bg-[var(--primary-600)] p-2"
 							disabled={
 								watchlistName.trim() === watchlist.name ||
@@ -155,8 +160,9 @@ const WatchlistCard = ({ watchlist }) => {
 							<Save className="size-6" />
 						</button>
 						<button
-							className="bg-red-500 text-white  rounded-md hover:bg-[var(--primary-600)] p-2"
-							onClick={toggleEditing}
+							type="button" // Prevent form submission on Cancel
+							className="bg-red-500 text-white rounded-md hover:bg-[var(--primary-600)] p-2"
+							onClick={handleCancelUpdate} // Handle cancel here
 						>
 							<XSquare className="size-6" />
 						</button>

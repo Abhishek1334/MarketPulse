@@ -1,6 +1,5 @@
 import WatchlistCard from "./WatchlistCard";
 import useStore from "../../context/Store";
-import { useEffect } from "react";
 
 const Watchlist = ({ loading }) => {
 	const { watchlists } = useStore();

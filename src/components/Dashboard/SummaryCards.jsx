@@ -3,13 +3,12 @@ import useStore from "@/context/Store";
 const SummaryCards = ({ loading }) => {
 	const { watchlists } = useStore();
 
-	// Ensure watchlists is defined and an array before calculating length
 	const totalWatchlist = Array.isArray(watchlists) ? watchlists.length : 0;
 	const totalStocksTracked = Array.isArray(watchlists)
 		? watchlists.reduce(
 				(total, watchlist) => total + (watchlist.stocks?.length || 0),
 				0
-		  )
+		)
 		: 0;
 
 	return (

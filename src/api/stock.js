@@ -1,21 +1,5 @@
 import axios from "./axiosInstance.js";
 
-//get stock data from external API by sending symbol as query
-
-export const getStockDatafromExternalAPI = async (symbol) => {
-	try {
-		const response = await axios.get(
-			`/stock/search?symbol=${symbol}`
-		)
-		return response.data;
-	} catch (error) {
-		console.error("Error Response:", error.response.data);
-		throw new Error(
-			error.response.data.message ||
-				"Something went wrong with the server."
-		);
-	}
-};
 
 
 export const AddStocksToWatchlist = async (watchlistId, symbol, note, targetPrice ) => {
@@ -28,9 +12,9 @@ export const AddStocksToWatchlist = async (watchlistId, symbol, note, targetPric
 		throw new Error("Missing required parameters : symbol");
 	}
 
-	const storedUser = localStorage.getItem("authUser");
-	const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-	const token = parsedUser?.token;
+	const storedState = localStorage.getItem("stock-dashboard-store");
+const parsedState = storedState ? JSON.parse(storedState) : null;
+const token = parsedState?.state?.user?.token;
 
 	if(!token){
 		throw new Error("User not authenticated.");
@@ -68,9 +52,9 @@ export const DeleteStockFromWatchlist = async (watchlistId, stockId) => {
 		throw new Error("Missing required parameters : stockId");
 	}
 
-	const storedUser = localStorage.getItem("authUser");
-	const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-	const token = parsedUser?.token;
+	const storedState = localStorage.getItem("stock-dashboard-store");
+const parsedState = storedState ? JSON.parse(storedState) : null;
+const token = parsedState?.state?.user?.token;
 
 	if(!token){
 		throw new Error("User not authenticated.");
@@ -102,9 +86,9 @@ export const UpdateStockInWatchlist = async (watchlistId, stockId, note, targetP
 		throw new Error("Missing required parameters : stockId");
 	}
 
-	const storedUser = localStorage.getItem("authUser");
-	const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-	const token = parsedUser?.token;	
+	const storedState = localStorage.getItem("stock-dashboard-store");
+const parsedState = storedState ? JSON.parse(storedState) : null;
+const token = parsedState?.state?.user?.token;	
 
 	if(!token){
 		throw new Error("User not authenticated.");

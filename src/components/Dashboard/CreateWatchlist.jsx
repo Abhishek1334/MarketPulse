@@ -18,10 +18,8 @@ const CreateWatchlist = ({ onClose }) => {
 	
 	const { mutate, isLoading, isError, error } = useMutation({
 		mutationFn: async ({ name, stocks }) => {
-			// Call CreateAWatchlist and await the response
 			const response = await CreateAWatchlist(name, stocks);
-			console.log("response", response);
-			return response; // Return the response
+			return response; 
 		},
 		onSuccess: (data) => {
 			queryClient.invalidateQueries("watchlists"); 
