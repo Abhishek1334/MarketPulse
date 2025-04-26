@@ -3,18 +3,25 @@ import axios from "axios";
 export const validateStockSymbol = async (symbol) => {
 	try {
 		const response = await axios.get(
-			`https://api.twelvedata.com/quote?symbol=${symbol}&apikey=${
-				import.meta.env.VITE_TWELVE_DATA_API_KEY
-			}`
+			`https://query2.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`
 		);
 
-		const data = response.data;
+		const quoteData = response.data?.quoteResponse?.result?.[0];
 
-		console.log(data);
-		// Optional: return full quote data if needed later
-		return data;
+		console.log(quoteData);
+
+		// If no valid data is returned
+		if (!quoteData || !quoteData.symbol) {
+			throw new Error(`Invalid stock symbol: ${symbol}`);
+		}
+
+		// Optional: return full quote data
+		return quoteData;
 	} catch (error) {
-		console.error(`Error validating stock symbol: ${symbol}`, error.message);
-		throw new Error(`Failed to validate stock symbol: ${symbol}.`, 400);
+		console.error(
+			`Error validating stock symbol: ${symbol}`,
+			error.message
+		);
+		throw new Error(`Failed to validate stock symbol: ${symbol}`);
 	}
 };

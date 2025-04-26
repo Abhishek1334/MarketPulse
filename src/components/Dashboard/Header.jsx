@@ -19,8 +19,9 @@ const Header = () => {
 	}
 
 	if(!user) return (
-		<div className=" bg-[var(--background-100)] text-[var(--text-950)] p-15  shadow-md rounded-lg flex flex-col justify-evenly transition-all duration-500 ease-in-out">
-			<h1 className="text-2xl font-bold mb-4 flex items-center gap-4">
+		<div className=" bg-[var(--background-100)] text-[var(--text-950)] p-15  shadow-md rounded-lg flex flex-col justify-evenly transition-all duration-500  ease-in-out
+		max-md:p-2">
+			<h1 className="text-2xl font-bold mb-4 flex items-center gap-4 ">
 				{" "}
 				{getGreeting()},<div className="loader "></div>
 			</h1>
@@ -33,7 +34,7 @@ const Header = () => {
 	);
 
 	return (
-		<div className=" bg-[var(--background-100)] text-[var(--text-950)] p-15  shadow-md rounded-lg flex flex-col justify-evenly transition-all duration-500 ease-in-out">
+		<div className=" bg-[var(--background-100)] text-[var(--text-950)] p-15  shadow-md rounded-lg flex flex-col justify-evenly transition-all duration-500 ease-in-out max-md:p-6">
 			<h1 className="text-2xl font-bold mb-4 ">
 				{" "}
 				{getGreeting()}, {user.name.split(" ")[0]}!

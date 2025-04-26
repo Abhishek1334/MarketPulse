@@ -1,12 +1,18 @@
 import express from "express";
 import {
-	searchStock,
-	getTimeSeriesStockData,
+	getStockData,
+	getStockDataforWatchlist,
+	getStockChartData,
+	searchStock
 } from "../controllers/externalStockController.js";
 const router = express.Router();
 
-router.get("/search", searchStock);
+router.get("/getStock", getStockData);
 
-router.get("/timeseries", getTimeSeriesStockData);
+router.get("/getStockforWatchlist", getStockDataforWatchlist);
+
+router.get("/chart", getStockChartData);
+
+router.get("/search", searchStock);
 
 export default router;

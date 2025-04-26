@@ -4,19 +4,23 @@ import { createError } from "./createError.js";
 export const validateStockSymbol = async (symbol) => {
 	try {
 		const response = await axios.get(
-			`https://api.twelvedata.com/quote?symbol=${symbol}&apikey=${process.env.TWELVE_DATA_API_KEY}`
+			`https://query2.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`
 		);
 
-		const data = response.data;
+		const quoteData = response.data?.quoteResponse?.result?.[0];
 
-		if (!data || data.code || data.message || data.status === "error") {
+		// If no valid data is returned for symbol
+		if (!quoteData || !quoteData.symbol) {
 			throw createError("Invalid stock symbol.", 400);
 		}
 
 		// Optional: return full quote data if needed later
-		return data;
+		return quoteData;
 	} catch (error) {
-		console.error(`Error validating stock symbol: ${symbol}`, error.message);
+		console.error(
+			`Error validating stock symbol: ${symbol}`,
+			error.message
+		);
 		throw createError(`Failed to validate stock symbol: ${symbol}.`, 400);
 	}
 };

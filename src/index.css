@@ -40,9 +40,10 @@
 
 body{
 	font-family: 'Nunito', sans-serif;
-	background-color: var(--light-10);
-	color: var(--dark-10);
-	transition: background-color 0.1s ease, color 0.1s ease-in; 
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
 }
 
 h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
@@ -51,7 +52,8 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
 
 @layer components{
 	.inputField {
-		@apply bg-[var(--secondary-300)] text-[var(--text-950)]  rounded-md px-4 py-2 focus:outline-none font-bold focus:ring-2 focus:ring-[var(--accent-500)];
+		@apply bg-[var(--secondary-300)] text-[var(--text-950)]  rounded-md px-4 py-2 focus:outline-none font-bold focus:ring-2 focus:ring-[var(--accent-500)]
+		max-md:px-2 max-md:py-2 max-md:font-medium max-md:text-sm ;
 	}
 
 	.loader {
@@ -73,7 +75,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
 	}
 
 	.summaryCard { 
-		@apply grid grid-cols-1 bg-[var(--secondary-100)] flex-wrap flex-grow text-[var(--text-950)] p-6 max-md:p-5 rounded-2xl shadow-md   hover:scale-[1.02] hover:shadow-lg transition-all duration-500 ease-in-out;
+		@apply grid grid-cols-1 bg-[var(--secondary-100)] flex-wrap flex-grow text-[var(--text-950)] p-6 max-md:p-3 rounded-2xl shadow-md   hover:scale-[1.02] hover:shadow-lg transition-all duration-500 ease-in-out min-w-[100px] min-h-[100px];
 	}
 
 	.toast-success {
@@ -87,7 +89,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
 	}
 
 	.nav-link {
-		@apply px-4 py-2 rounded-md transition-all duration-200 ease-in-out hover:bg-[var(--background-100)] hover:text-[var(--text-950)];	
+		@apply px-4 py-3 text-sm bg-[var(--background-200)] font-semibold text-[var(--text-950)] rounded-md transition-all duration-200 ease-in-out hover:bg-[var(--background-400)] hover:text-[var(--text-900)];	
 	}
 
 	.nav-link-active {
@@ -129,11 +131,11 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
 		@apply bg-[var(--background-50)] text-[var(--text-950)] p-5 rounded-xl shadow-sm hover:shadow-md  border border-[var(--background-200)] transition-all duration-500 ease-in-out space-y-3
 	}
 	.scrollable-content {
-		@apply overflow-auto;
+		@apply overflow-auto ;
 	}
 
 	.scrollable-content::-webkit-scrollbar {
-		width: 12px;
+		@apply w-2	max-md:w-1 max-md:h-1	;
 	}
 
 	.scrollable-content::-webkit-scrollbar-track {
@@ -150,6 +152,47 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
 	.scrollable-content::-webkit-scrollbar-thumb:hover {
 		background: var(--background-600);
 	}
+
+
+	.parent {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	grid-template-rows: repeat(5, minmax(100px, auto));
+	gap: 12px;
+}
+
+.div1 {
+	grid-column: span 5 / span 5;
+}
+
+.div2 {
+	grid-column: span 2 / span 2;
+	grid-row-start: 2;
+}
+
+.div6 {
+	grid-row: span 4 / span 4;
+	grid-column-start: 3;
+	grid-row-start: 2;
+}
+
+.div7 {
+	grid-column: span 2 / span 2;
+	grid-row: span 4 / span 4;
+	grid-column-start: 4;
+	grid-row-start: 2;
+}
+
+.div10 {
+	grid-row: span 3 / span 3;
+	grid-row-start: 3;
+}
+
+.div12 {
+	grid-row: span 3 / span 3;
+	grid-row-start: 3;
+}
+
 }
 
 @layer base {

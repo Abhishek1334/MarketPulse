@@ -49,18 +49,19 @@ const DashboardPage = () => {
 
 	
 	return (
-		<div className="px-15 py-10">
+		<div className="px-15 py-10 max-md:px-4 max-md:pt-6">
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
 				<Header />
 				<SummaryCards loading={isLoading} />
 			</div>
 			<div >
 				<div
-					className="text-[var(--text-50)] font-semibold my-5 flex place-self-end bg-[var(--background-950)] rounded-lg p-3 hover:bg-[var(--secondary-800)] hover:cursor-pointer hover:text-[var(--text-200)] text-sm hover:scale-101 transition-all duration-75 ease-in items-center gap-2"
+					className="text-[var(--text-50)] font-semibold my-5 flex place-self-end bg-[var(--background-950)] rounded-lg p-3 hover:bg-[var(--secondary-800)] hover:cursor-pointer hover:text-[var(--text-200)] text-sm hover:scale-101 transition-all duration-75 ease-in items-center gap-2
+					max-md:p-2 max-md:text-sm max-md:gap-1"
 					onClick={() => setShowForm(true)}
 				>
-					<Plus className="size-6"  />
-					Create New Watchlist{" "}
+					<Plus className="size-6 max-md:size-4"  />
+					New Watchlist{" "} 
 				</div>
 				{showForm && (
 					<CreateWatchlist

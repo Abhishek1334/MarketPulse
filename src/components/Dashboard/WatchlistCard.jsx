@@ -122,8 +122,9 @@ const WatchlistCard = ({ watchlist }) => {
 	const stocks = Array.isArray(watchlist.stocks) ? watchlist.stocks : [];
 
 	return (
-		<div className="bg-[var(--background-50)] text-[var(--text-950)] p-5 rounded-xl shadow-sm hover:shadow-md border border-[var(--background-200)] transition-all duration-500 ease-in-out">
-			<h3 className="font-semibold text-lg flex items-center gap-3 mb-1">
+		<div className="bg-[var(--background-50)] text-[var(--text-950)] p-5 rounded-xl shadow-sm hover:shadow-md border border-[var(--background-200)] transition-all duration-500 ease-in-out
+		max-md:p-3 ">
+			<h3 className="font-semibold text-lg flex items-center gap-3 mb-1 max-md:font-semibold max-md:text-base">
 				{isModalOpen && (
 					<ConfirmationModal
 						open={isModalOpen}
