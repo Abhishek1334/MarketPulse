@@ -24,16 +24,18 @@ const authMiddleware = async (req, res, next) => {
 			throw createError("User not found", 404);
 		}
 
-		req.user = user; // ✅ Now req.user._id will work
+		req.user = user;
 		next();
 	} catch (error) {
 		console.error("Auth Error: ", error);
 
 		if (error.name === "TokenExpiredError") {
-			throw createError("Token has expired", 401);
+			return res.status(401).json({ message: "TokenExpired" });
 		}
 
-		throw createError(error.message || "Unauthorized Access", 401);
+		return res
+			.status(401)
+			.json({ message: error.message || "Unauthorized Access" });
 	}
 };
 

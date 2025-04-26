@@ -84,6 +84,7 @@ const StockCard = ({ stock, watchlistId, handlePreviewStock }) => {
 		updateMutate({ watchlistId, stockId: stock._id, note, targetPrice });
 	}
 
+
 	return (
 		<div
 			className="bg-[var(--secondary-50)] rounded-xl shadow-sm p-4 grid grid-cols-5 gap-4 text-[var(--text-950)] items-center border border-[var(--secondary-200)] cursor-pointer hover:bg-[var(--secondary-100)] hover:shadow-md transition-all duration-200 ease-in-out"
@@ -110,7 +111,7 @@ const StockCard = ({ stock, watchlistId, handlePreviewStock }) => {
 			/>
 			<div onClick={(e) => {
 				e.stopPropagation()
-				navigate(`/watchlist/${watchlistId}/analytics/${stock._id}`)				
+				navigate(`/stocks/${stock.symbol}`)				
 			}}>
 				<p className="font-semibold text-lg">{stock.symbol}</p>
 				<p className="text-xs text-[var(--text-600)]">

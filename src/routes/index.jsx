@@ -8,6 +8,7 @@ import AnalyticsPage from "../pages/AnalyticsPage";
 import TestRateLimit from "../pages/TestRateLimit";
 import ProtectedRoute from "./ProtectedRoute";
 import Layout from "../components/Layout";
+import StockPage from "@/pages/StockPage";
 
 export const router = createBrowserRouter([
 	{
@@ -37,13 +38,14 @@ export const router = createBrowserRouter([
 								element: <WatchlistPage />,
 							},
 							{
-								path: "watchlist/:watchlistId/analytics/:stockId",
+								path: "stocks/:symbol",
 								element: <AnalyticsPage />,
+							},
+							{
+								path: "search/:symbol",
+								element: <AnalyticsPage/>
 							}
-							// {
-							// 	path:"test-rate-limit",
-							// 	element:<TestRateLimit/>
-							// }
+							
 						],
 					},
 				],

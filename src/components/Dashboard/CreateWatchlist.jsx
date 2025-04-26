@@ -133,14 +133,15 @@ const CreateWatchlist = ({ onClose }) => {
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className="bg-[var(--secondary-50)] shadow-2xl rounded-2xl p-5 flex flex-col gap-3 w-[50%] min-w-[400px] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[var(--text-950)] border border-[var(--background-600)] z-50"
+			className="bg-[var(--secondary-50)] shadow-2xl rounded-2xl p-5 flex flex-col gap-3 w-[50%]  absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[var(--text-950)] border border-[var(--background-600)] z-50
+			max-md:p-4 max-md:w-[60%] max-sm:w-[80%]" 
 		>
-			<div>
-				<h2 className="text-xl font-bold text-center">
+			<div className="flex justify-between gap-3">
+				<h2 className="text-lg font-bold ">
 					Create New Watchlist
 				</h2>
 				<XCircleIcon
-					className="top-2 right-2 cursor-pointer mt-2 mr-2"
+					className="top-2 right-2 cursor-pointer mt-1 mr-2"
 					onClick={() => {
 						resetForm();
 						onClose();
@@ -160,14 +161,14 @@ const CreateWatchlist = ({ onClose }) => {
 				/>
 			</div>
 
-			<div className="flex flex-col gap-2">
+			<div className="flex flex-col  gap-2">
 				<label className="text-md font-bold">Stocks (Optional)</label>
 				{stocks.map((stock, index) => (
 					<div
 						key={index}
-						className="flex flex-col gap-3 bg-[var(--accent-100)] p-4 rounded-xl shadow-md"
+						className="flex flex-col  gap-3 bg-[var(--accent-100)] p-4 rounded-xl shadow-md"
 					>
-						<div className="flex gap-2">
+						<div className="flex gap-2 flex-wrap">
 							<input
 								type="text"
 								placeholder="Symbol (e.g. AAPL)"

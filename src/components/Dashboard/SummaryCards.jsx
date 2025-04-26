@@ -17,7 +17,7 @@ const SummaryCards = ({ loading }) => {
 				<span className="font-Nunito text-2xl max-md:text-lg font-bold max-md:font-semibold">
 					Total Watchlists
 				</span>
-				<div className="text-3xl max-sm:text-xl font-semibold place-self-end">
+				<div className="text-3xl max-md:text-lg font-semibold place-self-end">
 					{loading ? (
 						<div className="flex items-center pt-4 max-sm:items-center">
 							<div className="loader"></div>
@@ -31,7 +31,7 @@ const SummaryCards = ({ loading }) => {
 				<span className="font-Nunito text-2xl max-md:text-lg font-bold max-md:font-semibold">
 					Total Stocks Tracked
 				</span>
-				<div className="text-3xl max-sm:text-xl font-semibold place-self-end">
+				<div className="text-3xl max-md:text-lg font-semibold place-self-end">
 					{loading ? (
 						<div className="flex items-center pt-4 max-sm:items-center">
 							<div className="loader"></div>

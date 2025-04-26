@@ -4,7 +4,9 @@ import StockMarketDataPreview from "./StockMarketDataPreview";
 import StockPreviewSkeleton from "./StockPreviewSkeleton";
 import { ListRestart } from 'lucide-react';
 
-const StockPreviewBox = ({ previewStock, previewStockData, setPreviewStock }) => {
+const StockPreviewBox = ({ previewStock, setPreviewStock, stockData }) => {
+
+	const previewStockData = stockData?.find((stock) => stock.symbol === previewStock?.symbol);
 	return (
 	<div className="col-span-1 bg-[var(--secondary-100)] shadow-sm rounded-xl px-4 py-4 border border-[var(--accent-200)] max-h-fit transition-all duration-500 ease-in-out min-h-fit">
 		{previewStock && <div>
