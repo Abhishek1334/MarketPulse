@@ -14,29 +14,39 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const mongoURI = process.env.MONGO_URI;
 
-// Middleware
+// Validate env vars
+if (!mongoURI) {
+	console.error("❌ MONGO_URI is not defined in .env");
+	process.exit(1);
+}
+
+// CORS Configuration (Local + Production)
 app.use(
 	cors({
-		origin: "http://localhost:5173", 
+		origin: [
+			"http://localhost:5173",
+			"https://market-pulse-two.vercel.app",
+		],
 		credentials: true,
 	})
 );
-app.use(express.json()); 
+app.options("*", cors()); // Preflight handling
+app.use(express.json());
 
-
-// Authentication Routes
+// Routes
 app.use("/api/auth", authRoutes);
-
-// Watchlist Routes (Protected)
 app.use("/api/watchlist", authMiddleware, watchlistRoutes);
 app.use("/api/stock", authMiddleware, stocksRoutes);
 
+// Error handling
 app.use(errorHandler);
 
+// Test route
 app.get("/", (req, res) => {
 	res.send("Server Started Successfully");
 });
 
+// DB connection
 const connectDB = async () => {
 	try {
 		await mongoose.connect(mongoURI);
@@ -52,5 +62,3 @@ const connectDB = async () => {
 };
 
 connectDB();
-
-
