@@ -21,7 +21,7 @@ const token = parsedState?.state?.user?.token;
 	}
 
 	try {
-		const response = await axios.post(`/watchlist/${watchlistId}/stock`, {
+		const response = await axios.post(`/watchlist/${watchlistId}/stocks`, {
 			symbol,
 			note,
 			targetPrice
