@@ -1,70 +1,53 @@
+// server.js (Your Express server file)
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import mongoose from "mongoose";
-import authMiddleware from "./middleware/authMiddleware.js";
-import authRoutes from "./routes/authRoutes.js";
-import watchlistRoutes from "./routes/watchlistRoutes.js";
-import stocksRoutes from "./routes/stocksRoutes.js";
-import errorHandler from "./middleware/errorHandler.js";
+import dotenv from "dotenv";
+import authRoutes from "./routes/auth.js"; // Adjust the path if needed
+import watchlistRoutes from "./routes/watchlist.js"; // Adjust the path if needed
+import stockRoutes from "./routes/stock.js"; // Adjust the path if needed
+import errorHandler from "./middleware/error.js"; // Adjust the path if needed
 
 dotenv.config();
+
 const app = express();
-
 const PORT = process.env.PORT || 5000;
-const mongoURI = process.env.MONGO_URI;
 
-// CORS Configuration
-const corsOptions = {
-	origin: ["https://marketpulse-glx.onrender.com", "http://localhost:5173"],
-	methods: ["GET", "POST", "PUT", "DELETE"],
-	allowedHeaders: ["Content-Type", "Authorization"],
-	credentials: true,
-};
-console.log("CORS Options:", corsOptions);
-app.use(cors(corsOptions));
-console.log("CORS middleware applied.");
+// **AGGRESSIVE CORS CONFIGURATION**
+app.use(
+	cors({
+		origin: "*", // Allow all origins
+		methods: "*", // Allow all HTTP methods
+		allowedHeaders: "*", // Allow all headers
+		credentials: true,
+	})
+);
+
+// Body parser middleware
 app.use(express.json());
-// Routes
-console.log("Applying auth routes at /api/auth");
-app.use("/auth", authRoutes);
-console.log("Applying watchlist routes at /api/watchlist");
-app.use("/watchlist", authMiddleware, watchlistRoutes);
-console.log("Applying stock routes at /api/stock");
-app.use("/stock", authMiddleware, stocksRoutes);
 
-// Error handling
-console.log("Applying error handler middleware.");
+// Connect to MongoDB
+mongoose
+	.connect(process.env.MONGODB_URI, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+	})
+	.then(() => console.log("✅ MongoDB Connected Successfully!!"))
+	.catch((err) => console.error("MongoDB Connection Error:", err));
+
+// Apply routes
+app.use("/api/auth", authRoutes);
+app.use("/api/watchlist", watchlistRoutes);
+app.use("/api/stock", stockRoutes);
+
+// Error handler middleware
 app.use(errorHandler);
 
-// Test route
 app.get("/", (req, res) => {
-	console.log("Handling GET request to /");
-	res.send("Server Started Successfully");
+	res.send("Server is running!");
 });
 
-// DB connection
-const connectDB = async () => {
-	try {
-		console.log("Connecting to MongoDB...");
-		await mongoose.connect(mongoURI);
-		console.log("✅ MongoDB Connected Successfully!!");
-
-		const server = app.listen(PORT, () => {
-			console.log(`🚀 Server running on PORT: ${PORT}`);
-		});
-
-		server.on("listening", () => {
-			console.log("Express server started and listening on port:", PORT);
-		});
-
-		server.on("error", (error) => {
-			console.error("Express server error:", error);
-		});
-	} catch (error) {
-		console.error("❌ MongoDB Connection Error:", error.message);
-		process.exit(1);
-	}
-};
-
-connectDB();
+app.listen(PORT, () => {
+	console.log(`🚀 Server running on PORT: ${PORT}`);
+	console.log(`Express server started and listening on port: ${PORT}`);
+});
