@@ -1,4 +1,5 @@
-import axios from "./axiosInstance.js";
+import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const LoginUser = async (email, password) => {
 	console.log("API URL in loginUser:", import.meta.env.VITE_API_URL);
@@ -7,7 +8,7 @@ export const LoginUser = async (email, password) => {
 			throw new Error("All the fields are required.");
 		}
 
-		const response = await axios.post("/api/auth/login", {
+		const response = await axios.post(`${API_URL}/api/auth/login`, {
 			email,
 			password,
 		});		
