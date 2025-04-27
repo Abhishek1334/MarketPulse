@@ -55,7 +55,7 @@ router.post("/:watchlistId/stock", addStockToWatchlist);
 
 // @route   POST /api/watchlist/:watchlistId/stocks
 // @desc    Add multiple stocks to a specific watchlist
-router.post("/:watchlistId/stock", addMultipleStocksToWatchlist);
+router.post("/:watchlistId/stocks", addMultipleStocksToWatchlist);
 
 
 // @route   DELETE /api/watchlist/:watchlistId/stocks/:stockId
