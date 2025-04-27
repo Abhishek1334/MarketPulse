@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import mongoose from "mongoose";
 import authMiddleware from "./middleware/authMiddleware.js";
-import authRoutes from "./routes/authRoutes.js";
+// import authRoutes from "./routes/authRoutes.js";
 // import watchlistRoutes from "./routes/watchlistRoutes.js";
 import stocksRoutes from "./routes/stocksRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
