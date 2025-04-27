@@ -1,41 +1,43 @@
-import React from 'react'
+import React from "react";
 import moment from "moment";
+
 const StockPreview = ({ previewStock }) => {
 	return (
-		<div className="space-y-1 border-b-2 pb-4">
-			<h2 className="text-xl font-semibold text-[var(--text-950)] pb-2 transition-all duration-500 ease-in-out">
-				Stock Preview
-			</h2>
-			<div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-				<p>
-					<span className="font-medium">
-						Symbol:
-					</span>{" "}
-					{previewStock.symbol}
-				</p>
-				<p>
-					<span className="font-medium">
-						Target Price:
-					</span>{" "}
-					${previewStock.targetPrice}
-				</p>
-				<p>
-					<span className="font-medium">
-						Note:
-					</span>{" "}
-					{previewStock.note || "—"}
-				</p>
-				<p>
-					<span className="font-medium">
-						Added:
-					</span>{" "}
-					{moment(previewStock.addedAt).format(
-						"MMM D, YYYY"
-					)}
-				</p>
+		<div className="space-y-6">
+			<div className="flex items-center justify-between">
+				<div>
+					<h3 className="text-3xl font-bold text-[var(--text-900)]">
+						{previewStock.symbol}
+					</h3>
+					<p className="text-[var(--text-600)] mt-1">
+						Added{" "}
+						{moment(previewStock.addedAt).format("MMM D, YYYY")}
+					</p>
+				</div>
+				{previewStock.targetPrice && (
+					<div className="bg-[var(--primary-100)] px-4 py-2 rounded-lg">
+						<p className="text-sm text-[var(--primary-600)]">
+							Target Price
+						</p>
+						<p className="text-xl font-bold text-[var(--primary-800)]">
+							${previewStock.targetPrice}
+						</p>
+					</div>
+				)}
 			</div>
-		</div>
-	)
-}
 
-export default StockPreview
+			{previewStock.note && (
+				<div className="bg-[var(--background-100)] rounded-lg p-4">
+					<p className="text-sm font-medium text-[var(--text-600)]">
+						Note
+					</p>
+					<p className="text-[var(--text-900)] mt-1">
+						{previewStock.note}
+					</p>
+				</div>
+			)}
+		</div>
+	);
+};
+
+export default StockPreview;

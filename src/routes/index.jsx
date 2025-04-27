@@ -5,16 +5,19 @@ import RegisterPage from "../pages/RegisterPage";
 import DashboardPage from "../pages/DashboardPage";
 import WatchlistPage from "../pages/WatchlistPage";
 import AnalyticsPage from "../pages/AnalyticsPage";
-import TestRateLimit from "../pages/TestRateLimit";
+import HomePage from "../pages/Homepage";
 import ProtectedRoute from "./ProtectedRoute";
 import Layout from "../components/Layout";
-import StockPage from "@/pages/StockPage";
 
 export const router = createBrowserRouter([
 	{
 		path: "/",
 		element: <App />,
 		children: [
+			{
+				path: "",
+				element: <HomePage />,
+			},
 			{
 				path: "login",
 				element: <LoginPage />,
@@ -43,9 +46,8 @@ export const router = createBrowserRouter([
 							},
 							{
 								path: "search/:symbol",
-								element: <AnalyticsPage/>
-							}
-							
+								element: <AnalyticsPage />,
+							},
 						],
 					},
 				],

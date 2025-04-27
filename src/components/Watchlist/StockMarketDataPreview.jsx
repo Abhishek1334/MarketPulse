@@ -5,68 +5,107 @@ const StockMarketDataPreview = ({ previewStockData }) => {
 	if (!previewStockData) return null;
 
 	const {
-		regularMarketOpen,
-		regularMarketPrice,
-		regularMarketDayHigh,
-		regularMarketDayLow,
-		regularMarketChange,
-		regularMarketChangePercent,
-		regularMarketVolume,
-		fiftyTwoWeekRange,
-		marketState,
-		regularMarketTime,
+		price,
+		change,
+		changePercent,
+		dayHigh,
+		dayLow,
+		volume,
+		fiftyTwoWeekHigh,
+		fiftyTwoWeekLow,
+		marketCap,
+		updatedAt, // assuming you have some updatedAt timestamp or fallback to current time
+		marketState = "OPEN", // assuming default if not available
 	} = previewStockData;
 
 	return (
-		<div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-			<p>
-				<span className="font-medium">Open:</span> $
-				{regularMarketOpen?.toFixed(2)}
-			</p>
-			<p>
-				<span className="font-medium">Close:</span> $
-				{regularMarketPrice?.toFixed(2)}
-			</p>
-			<p>
-				<span className="font-medium">High:</span> $
-				{regularMarketDayHigh?.toFixed(2)}
-			</p>
-			<p>
-				<span className="font-medium">Low:</span> $
-				{regularMarketDayLow?.toFixed(2)}
-			</p>
-			<p>
-				<span className="font-medium">Change:</span>{" "}
-				<span
-					className={
-						regularMarketChange >= 0
-							? "text-green-600"
-							: "text-red-600"
-					}
-				>
-					${regularMarketChange?.toFixed(2)} (
-					{regularMarketChangePercent?.toFixed(2)}%)
-				</span>
-			</p>
-			<p>
-				<span className="font-medium">Volume:</span>{" "}
-				{regularMarketVolume?.toLocaleString()}
-			</p>
-			<p>
-				<span className="font-medium">52W Range:</span>{" "}
-				{fiftyTwoWeekRange
-					? `${fiftyTwoWeekRange.low} - ${fiftyTwoWeekRange.high}`
-					: "N/A"}
-			</p>
-			<p>
-				<span className="font-medium">Market:</span>{" "}
-				{marketState === "OPEN" ? "Open" : "Closed"}
-			</p>
-			<p className="col-span-2">
-				<span className="font-medium">Last Quote:</span>{" "}
-				{regularMarketTime
-					? moment(regularMarketTime).format("MMM D, YYYY, h:mm A")
-					: "N/A"}
+		<div className="grid grid-cols-2 gap-6">
+			<div className="col-span-2 bg-[var(--background-100)] rounded-lg p-4">
+				<div className="flex justify-between items-center">
+					<div>
+						<p className="text-sm text-[var(--text-600)]">
+							Current Price
+						</p>
+						<p className="text-2xl font-bold text-[var(--text-900)]">
+							${price?.toFixed(2)}
+						</p>
+					</div>
+					<div
+						className={`text-right ${
+							change >= 0 ? "text-green-600" : "text-red-600"
+						}`}
+					>
+						<p className="text-sm">Daily Change</p>
+						<p className="text-lg font-bold">
+							${change?.toFixed(2)} ({changePercent?.toFixed(2)}%)
+						</p>
+					</div>
+				</div>
+			</div>
+
+			<div className="space-y-4">
+				<div className="bg-[var(--background-100)] rounded-lg p-4">
+					<p className="text-sm text-[var(--text-600)]">Day High</p>
+					<p className="text-lg font-semibold text-[var(--text-900)]">
+						${dayHigh?.toFixed(2)}
+					</p>
+				</div>
+				<div className="bg-[var(--background-100)] rounded-lg p-4">
+					<p className="text-sm text-[var(--text-600)]">Day Low</p>
+					<p className="text-lg font-semibold text-[var(--text-900)]">
+						${dayLow?.toFixed(2)}
+					</p>
+				</div>
+			</div>
+
+			<div className="space-y-4">
+				<div className="bg-[var(--background-100)] rounded-lg p-4">
+					<p className="text-sm text-[var(--text-600)]">Volume</p>
+					<p className="text-lg font-semibold text-[var(--text-900)]">
+						{volume?.toLocaleString()}
+					</p>
+				</div>
+				<div className="bg-[var(--background-100)] rounded-lg p-4">
+					<p className="text-sm text-[var(--text-600)]">Market Cap</p>
+					<p className="text-lg font-semibold text-[var(--text-900)]">
+						{marketCap
+							? `$${(marketCap / 1e9).toFixed(2)}B`
+							: "N/A"}
+					</p>
+				</div>
+			</div>
+
+			<div className="col-span-2 bg-[var(--background-100)] rounded-lg p-4">
+				<div className="flex justify-between items-center">
+					<div>
+						<p className="text-sm text-[var(--text-600)]">
+							52 Week Range
+						</p>
+						<p className="text-lg font-semibold text-[var(--text-900)]">
+							${fiftyTwoWeekLow?.toFixed(2)} - $
+							{fiftyTwoWeekHigh?.toFixed(2)}
+						</p>
+					</div>
+					<div className="text-right">
+						<p className="text-sm text-[var(--text-600)]">
+							Market Status
+						</p>
+						<p
+							className={`text-lg font-semibold ${
+								marketState === "OPEN"
+									? "text-green-600"
+									: "text-red-600"
+							}`}
+						>
+							{marketState === "OPEN" ? "Open" : "Closed"}
+						</p>
+					</div>
+				</div>
+			</div>
+
+			<p className="col-span-2 text-sm text-[var(--text-500)] text-center">
+				Last updated:{" "}
+				{moment(updatedAt || new Date()).format("MMM D, YYYY, h:mm A")}
 			</p>
 		</div>
 	);
