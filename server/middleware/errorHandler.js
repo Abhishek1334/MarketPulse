@@ -1,4 +1,3 @@
-import e from "express";
 
 const errorHandler = (err, req, res, next) => {
 	const statusCode = err.statusCode || 500;
