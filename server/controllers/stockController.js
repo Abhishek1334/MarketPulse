@@ -22,63 +22,6 @@ export const getStocksinWatchlist = async (req, res) => {
 };
 
 
-
-// POST api/watchlist/:watchlistId/stock
-// for adding a single stock to a specific watchlist
-export const addStockToWatchlist = async (req, res, next) => {
-	try {
-		const watchlistId = req.params.watchlistId;
-		const { symbol, note, targetPrice } = req.body;
-
-		if (!symbol) {
-			return next(createError("Symbol is required.", 400));
-		}
-
-		const existing = await watchlist.findById(watchlistId);
-		if (!existing) return next(createError("Watchlist not found.", 404));
-
-		if (!checkOwnership(existing.user, req.user._id)) {
-			return next(createError("Unauthorized.", 403));
-		}
-
-		const data = await validateStockSymbol(symbol);
-
-		if (!data || data.code || data.message || data.status === "error") {
-			return next(createError("Invalid stock symbol.", 400));
-		}
-
-		// ✅ Check if stock already exists in watchlist
-		const existingStock = existing.stocks.find(
-			(stock) => stock.symbol.toUpperCase() === symbol.toUpperCase()
-		);
-
-		if (existingStock) {
-			return next(
-				createError("Stock already exists in the watchlist.", 409)
-			);
-		}
-
-		// ✅ Add stock
-		const newStock = {
-			symbol: symbol.toUpperCase(),
-			note,
-			targetPrice,
-		};
-
-		existing.stocks.push(newStock);
-		await existing.save();
-
-		res.status(200).json({
-			message: "Stock added to watchlist successfully.",
-			watchlist: existing,
-		});
-	} catch (error) {
-		console.error("Error adding stock to watchlist:", error.message);
-		next(createError(error.message || "Failed to add stock to watchlist.", 500));
-	}
-};
-
-
 //POST api/watchlist/:watchlistId/stocks
 // for adding multiple stocks to a specific watchlist
 export const addMultipleStocksToWatchlist = async (req, res) => {
