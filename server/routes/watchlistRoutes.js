@@ -10,7 +10,6 @@ import {
 import {
 	getStocksinWatchlist,
 	addMultipleStocksToWatchlist,
-	addStockToWatchlist,
 	deleteStockFromWatchlist,
 	updateStockinWatchlist,
 } from "../controllers/stockController.js";
@@ -49,9 +48,7 @@ router.put("/:watchlistId", updateWatchlist);
 // @desc    Get all stocks in a specific watchlist
 router.get("/:watchlistId/stocks", getStocksinWatchlist);
 
-// @route   POST /api/watchlist/:watchlistId/stocks
-// @desc    Add a single stock to a specific watchlist
-router.post("/:watchlistId/stock", addStockToWatchlist);
+
 
 // @route   POST /api/watchlist/:watchlistId/stocks
 // @desc    Add multiple stocks to a specific watchlist
