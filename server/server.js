@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import authMiddleware from "./middleware/authMiddleware.js";
 // import authRoutes from "./routes/authRoutes.js";
 // import watchlistRoutes from "./routes/watchlistRoutes.js";
-import stocksRoutes from "./routes/stocksRoutes.js";
+// import stocksRoutes from "./routes/stocksRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 dotenv.config();
@@ -36,7 +36,7 @@ app.use(express.json());
 // Routes
 // app.use("/api/auth", authRoutes);
 // app.use("/api/watchlist", authMiddleware, watchlistRoutes);
-app.use("/api/stock", authMiddleware, stocksRoutes);
+// app.use("/api/stock", authMiddleware, stocksRoutes);
 
 // Error handling
 app.use(errorHandler);
