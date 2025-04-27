@@ -42,33 +42,10 @@
 | **Frontend**     | React.js, Vite, Tailwind CSS                                  |
 | **State Mgmt**   | Zustand, React Query                                           |
 | **Charting**     | Chart.js                                                       |
-| **APIs**         | Yahoo Finance API (optional), Twelve Data   |
+| **APIs**         | Yahoo Finance API, Twelve Data   |
 | **Backend**      | Node.js, Express.js, JWT (Authentication)                     |
 | **Deployment**   | Vercel (Frontend), Render (Backend)                   |
 
----
-
-## 🛠️ Installation and Setup
-
-```bash
-# 1. Clone the repo
-git clone https://github.com/your-username/market-pulse.git
-
-# 2. Navigate into the project
-cd market-pulse
-
-# 3. Install dependencies
-npm install
-
-# 4. Create a .env file
-# Add your API keys (example below)
-
-VITE_STOCK_API_KEY=your_api_key_here
-
-# 5. Run the development server
-npm run dev
-```
----
 ---
 
 ## 🚀 Deployment
@@ -79,20 +56,42 @@ The app is deployed on **Vercel** for seamless performance.
 
 ---
 
-## 📸 Website Screenshots
+## 🖼️ Screenshots
 
-| Home Page 🏠 | Analytics Page 📈 | Stock Detail Page 📃 |
-|:------------:|:-----------------:|:--------------------:|
-| ![Home](./screenshots/home.png) | ![Analytics](./screenshots/analytics.png) | ![Details](./screenshots/stock.png) |
+<table>
+  <tr>
+    <td><b>Homepage</b></td>
+    <td><b>Login Page</b></td>
+    <td><b>Signup Page</b></td>
+  </tr>
+  <tr>
+    <td><img src="./public/screenshots/Homepage.png" alt="Homepage" width="300"/></td>
+    <td><img src="./public/screenshots/loginPage.png" alt="Login" width="300"/></td>
+    <td><img src="./public/screenshots/signupPage.png" alt="Signup" width="300"/></td>
+  </tr>
 
----
+  <tr>
+    <td><b>Dashboard (Light Mode)</b></td>
+    <td><b>Dashboard (Dark Mode)</b></td>
+    <td><b>Analytics Page (Light Mode)</b></td>
+  </tr>
+  <tr>
+    <td><img src="./public/screenshots/DashboardLight.png" alt="Dashboard Light Mode" width="300"/></td>
+    <td><img src="./public/screenshots/DashboardDark.png" alt="Dashboard Dark Mode" width="300"/></td>
+    <td><img src="./public/screenshots/AnalyticsPageLight.png" alt="Analytics Page Light Mode" width="300"/></td>
+  </tr>
 
-## 🎥 Live Demo Video
-
-🎬 **Watch the Live Demo:**  
-[![Watch the video](https://img.youtube.com/vi/your-youtube-id-here/0.jpg)](https://www.youtube.com/watch?v=your-youtube-id-here)
-
----
+  <tr>
+    <td><b>Analytics Page (Dark Mode)</b></td>
+    <td><b>Watchlist Page (Light Mode)</b></td>
+    <td><b>Watchlist Page (Dark Mode)</b></td>
+  </tr>
+  <tr>
+    <td><img src="./public/screenshots/AnalyticsPageDark.png" alt="Analytics Page Dark Mode" width="300"/></td>
+    <td><img src="./public/screenshots/WatchlistPageLight.png" alt="Watchlist Page Light Mode" width="300"/></td>
+    <td><img src="./public/screenshots/WatchlistPageDark.png" alt="Watchlist Page Dark Mode" width="300"/></td>
+  </tr>
+</table>
 
 ## 📚 API Documentation
 
