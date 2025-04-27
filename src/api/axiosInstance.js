@@ -2,7 +2,7 @@ import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const axiosInstance = axios.create({
-	baseURL: API_URL, 
+	baseURL: API_URL, // Should be "https://marketpulse-gifx.onrender.com/api"
 	withCredentials: true,
 });
 // Add a response interceptor
