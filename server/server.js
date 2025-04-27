@@ -14,14 +14,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const mongoURI = process.env.MONGO_URI;
 
-// Validate env vars
-if (!mongoURI) {
-    console.error("❌ MONGO_URI is not defined in .env");
-    process.exit(1);
-}
-//allow request from https://marketpulse-gifx.onrender.com and localhost:5173
 
-// like https://marketpulse-glx.onrender.com/api/auth/login
 const corsOptions = {
     origin: ["https://marketpulse-glx.onrender.com", "http://localhost:5173"],
     methods: ["GET", "POST", "PUT", "DELETE"],
