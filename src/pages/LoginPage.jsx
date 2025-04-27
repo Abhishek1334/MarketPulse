@@ -28,6 +28,8 @@ const LoginPage = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		console.log("form submitted");
+		console.log("API URL:", import.meta.env.VITE_API_URL);
 
 		if (!email || !password) {
 			showError("All the fields are required.");
