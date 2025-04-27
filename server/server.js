@@ -14,14 +14,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const mongoURI = process.env.MONGO_URI;
 
-app.use(
-	cors({
-		origin: "*", // Allow all origins
-		methods: "*", // Allow all HTTP methods
-		allowedHeaders: "*", // Allow all headers
-		credentials: true,
-	})
-);
+app.use(cors());
 
 // Body parser middleware
 app.use(express.json());
