@@ -4,6 +4,7 @@ import useStore from "../context/Store";
 import { useNavigate, Link } from "react-router-dom";
 import { showSuccess, showError } from "../utils/toast";
 import { Eye, EyeClosed } from "lucide-react";
+import Logo from "@/components/Homepage/Logo";
 
 const RegisterPage = () => {
 	const [email, setEmail] = useState("");
@@ -52,6 +53,7 @@ const RegisterPage = () => {
 
 	return (
 		<div className="flex flex-col h-screen justify-center items-center px-4 bg-[var(--background-50)]  transition-all duration-1000 ease-in-out">
+			<Logo className="ml-4" />
 			<div className="shadow-lg p-8 rounded-2xl max-w-sm w-full bg-[var(--background-950)]  text-[var(--text-50)]">
 				<h1 className="text-3xl font-bold mb-6 text-center">
 					Register

@@ -130,28 +130,65 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, select, textarea {
 	.skeleton-box {
 		@apply bg-[var(--background-50)] text-[var(--text-950)] p-5 rounded-xl shadow-sm hover:shadow-md  border border-[var(--background-200)] transition-all duration-500 ease-in-out space-y-3
 	}
-	.scrollable-content {
-		@apply overflow-auto ;
-	}
+.scrollable-content {
+	scrollbar-width: thin;
+	scrollbar-color: rgba(0, 0, 0, 0.4) transparent;
+	overflow-y: auto;
+}
 
-	.scrollable-content::-webkit-scrollbar {
-		@apply w-2	max-md:w-1 max-md:h-1	;
-	}
+/* Webkit Browsers */
+.scrollable-content::-webkit-scrollbar {
+	width: 6px; /* thinner scrollbar */
+	height: 6px; /* optional, if you have horizontal scrolls */
+}
 
-	.scrollable-content::-webkit-scrollbar-track {
-		@apply bg-[var(--background-50)] rounded-xl border border-[var(--background-200)]
-	}
+/* Remove arrows */
+.scrollable-content::-webkit-scrollbar-button {
+	display: none;
+	width: 0;
+	height: 0;
+}
 
-	.scrollable-content::-webkit-scrollbar-thumb {
-		background: var(--background-900);
-		border-radius: 10px;
-		border: var(--accent-100) solid 2px;
-		
-	}
+/* Scrollbar Track */
+.scrollable-content::-webkit-scrollbar-track {
+	background: transparent;
+}
 
-	.scrollable-content::-webkit-scrollbar-thumb:hover {
-		background: var(--background-600);
-	}
+/* Scrollbar Thumb */
+.scrollable-content::-webkit-scrollbar-thumb {
+	background-color: rgba(0, 0, 0, 0.9);
+	border-radius: 9999px; /* FULLY rounded */
+	transition: background-color 0.2s;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb:hover {
+	background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* Dark Mode */
+.dark .scrollable-content {
+	scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+}
+
+.dark .scrollable-content::-webkit-scrollbar-thumb {
+	background-color: rgba(255, 255, 255, 0.4);
+}
+
+.dark .scrollable-content::-webkit-scrollbar-thumb:hover {
+	background-color: rgba(255, 255, 255, 0.6);
+}
+
+/* Firefox: Target all scrollbars */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: rgba(0, 0, 0, 0.4) transparent;
+}
+
+.dark * {
+	scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+}
+
+
 
 
 	.parent {

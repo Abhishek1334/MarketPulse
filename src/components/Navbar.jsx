@@ -5,6 +5,7 @@ import useStore from "../context/Store";
 import StockSearchBar from "./StockSearchBar";
 import ThemeToggle from "./ThemeToggle";
 import { useAnalyticsStore } from "@/context/AnalyticsStore";
+import Logo from "./Homepage/Logo";
 export default function Navbar() {
 	const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -45,12 +46,16 @@ export default function Navbar() {
 		<nav className="bg-[var(--background-100)] ">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between h-16">
-					{/* Logo - Hidden on mobile when search is expanded */}
 					<div
 						className={`flex items-center justify-between w-full gap-10 max-md:gap-5 ${
 							isSearchExpanded ? "hidden md:flex" : "flex"
 						}`}
 					>
+						<Logo
+							className={`w-15  ${
+								isSearchExpanded ? "hidden" : ""
+							}`}
+						/>
 						<Link to="/" className="flex items-center space-x-2">
 							<span className="text-2xl font-bold text-[var(--text-950)]">
 								MarketPulse

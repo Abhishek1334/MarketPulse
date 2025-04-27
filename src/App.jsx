@@ -1,3 +1,4 @@
+// App.jsx
 import { Outlet } from "react-router-dom";
 import useStore from "./context/Store";
 import { Slide, ToastContainer } from "react-toastify";
@@ -8,7 +9,7 @@ import { useEffect } from "react";
 
 function App() {
 	const setWatchlists = useStore((state) => state.setWatchlists);
-	const hasHydrated = useStore.persist.hasHydrated(); 
+	const hasHydrated = useStore.persist.hasHydrated();
 
 	const { data: watchlists, isSuccess } = useQuery({
 		queryKey: ["watchlists"],
@@ -28,7 +29,7 @@ function App() {
 	}
 
 	return (
-		<div className="bg-[var(--background-50)] min-h-screen transition-all duration-500 ease-in-out">
+		<div className="flex flex-col h-screen bg-[var(--background-50)] transition-all duration-500 ease-in-out">
 			<ToastContainer
 				transition={Slide}
 				position="top-right"
