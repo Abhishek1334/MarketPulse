@@ -25,7 +25,7 @@ app.use(
 	cors({
 		origin: [
 			"http://localhost:5173",
-			"https://market-pulse-two.vercel.app",
+			"https://market-pulse-two.vercel.app/api",
 		],
 		credentials: true,
 	})
