@@ -27,11 +27,11 @@ console.log("CORS middleware applied.");
 app.use(express.json());
 // Routes
 console.log("Applying auth routes at /api/auth");
-app.use("/api/auth", authRoutes);
+app.use("/auth", authRoutes);
 console.log("Applying watchlist routes at /api/watchlist");
-app.use("/api/watchlist", authMiddleware, watchlistRoutes);
+app.use("/watchlist", authMiddleware, watchlistRoutes);
 console.log("Applying stock routes at /api/stock");
-app.use("/api/stock", authMiddleware, stocksRoutes);
+app.use("/stock", authMiddleware, stocksRoutes);
 
 // Error handling
 console.log("Applying error handler middleware.");
