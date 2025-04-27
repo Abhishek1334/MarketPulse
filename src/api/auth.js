@@ -7,7 +7,7 @@ export const LoginUser = async (email, password) => {
 			throw new Error("All the fields are required.");
 		}
 
-		const response = await axios.post("/auth/login", {
+		const response = await axios.post("/api/auth/login", {
 			email,
 			password,
 		});		
