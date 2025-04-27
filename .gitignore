@@ -30,13 +30,7 @@ dist-ssr/
 *.sln
 *.sw?
 
-# Zip and binary files
-*.zip
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.webp
+
 
 # Optional cache and dependency directories
 .cache/
