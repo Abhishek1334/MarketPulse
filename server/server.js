@@ -3,9 +3,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 import mongoose from "mongoose";
 import authMiddleware from "./middleware/authMiddleware.js";
-// import authRoutes from "./routes/authRoutes.js";
-// import watchlistRoutes from "./routes/watchlistRoutes.js";
-// import stocksRoutes from "./routes/stocksRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import watchlistRoutes from "./routes/watchlistRoutes.js";
+import stocksRoutes from "./routes/stocksRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 dotenv.config();
@@ -16,49 +16,39 @@ const mongoURI = process.env.MONGO_URI;
 
 // Validate env vars
 if (!mongoURI) {
-	console.error("❌ MONGO_URI is not defined in .env");
-	process.exit(1);
+    console.error("❌ MONGO_URI is not defined in .env");
+    process.exit(1);
 }
 
-// CORS Configuration (Local + Production)
-app.use(
-	cors({
-		origin: [
-			"http://localhost:5173",
-			"https://market-pulse-two.vercel.app", // REMOVE /api here
-		],
-		credentials: true,
-	})
-);
-app.options("*", cors()); // Preflight handling
-app.use(express.json());
+app.use(cors());
+
 
 // Routes
-// app.use("/api/auth", authRoutes);
-// app.use("/api/watchlist", authMiddleware, watchlistRoutes);
-// app.use("/api/stock", authMiddleware, stocksRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/watchlist", authMiddleware, watchlistRoutes);
+app.use("/api/stock", authMiddleware, stocksRoutes);
 
 // Error handling
 app.use(errorHandler);
 
 // Test route
 app.get("/", (req, res) => {
-	res.send("Server Started Successfully");
+    res.send("Server Started Successfully");
 });
 
 // DB connection
 const connectDB = async () => {
-	try {
-		await mongoose.connect(mongoURI);
-		console.log("✅ MongoDB Connected Successfully!!");
+    try {
+        await mongoose.connect(mongoURI);
+        console.log("✅ MongoDB Connected Successfully!!");
 
-		app.listen(PORT, () => {
-			console.log(`🚀 Server running on PORT: ${PORT}`);
-		});
-	} catch (error) {
-		console.error("❌ MongoDB Connection Error:", error.message);
-		process.exit(1);
-	}
+        app.listen(PORT, () => {
+            console.log(`🚀 Server running on PORT: ${PORT}`);
+        });
+    } catch (error) {
+        console.error("❌ MongoDB Connection Error:", error.message);
+        process.exit(1);
+    }
 };
 
 connectDB();
