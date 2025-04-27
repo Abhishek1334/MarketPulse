@@ -46,7 +46,7 @@ LIVE SITE: https://market-pulse-two.vercel.app/
 | **Charting**     | Chart.js                                                       |
 | **APIs**         | Yahoo Finance API, Twelve Data   |
 | **Backend**      | Node.js, Express.js, JWT (Authentication)                     |
-| **Deployment**   | Vercel (Frontend), Render (Backend)                   |
+| **Deployment**   | Vercel (Frontend), Railway (Backend)                   |
 
 ---
 
