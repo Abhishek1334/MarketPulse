@@ -18,7 +18,6 @@ axiosInstance.interceptors.response.use(
 			error.response.status === 401 &&
 			error.response.data.message === "TokenExpired"
 		) {
-			
 			// Remove token from localStorage
 			localStorage.removeItem("stock-dashboard-store");
 
