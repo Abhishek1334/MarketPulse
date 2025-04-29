@@ -1,26 +1,19 @@
-import axios from "axios";
-import { createError } from "./createError.js";
+import yahooFinance from "yahoo-finance2";
 
 export const validateStockSymbol = async (symbol) => {
 	try {
-		const response = await axios.get(
-			`https://query2.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`
-		);
+		// Search for the symbol using Yahoo Finance's search API
+		const result = await yahooFinance.search(symbol);
 
-		const quoteData = response.data?.quoteResponse?.result?.[0];
-
-		// If no valid data is returned for symbol
-		if (!quoteData || !quoteData.symbol) {
-			throw createError("Invalid stock symbol.", 400);
+		// Check if any stocks were returned
+		if (!result.quotes || result.quotes.length === 0) {
+			throw new Error(`Stock symbol ${symbol} not found.`);
 		}
 
-		// Optional: return full quote data if needed later
-		return quoteData;
+		// Optionally, return the first matched result
+		return result.quotes[0]; // This will return the first stock that matches the search
 	} catch (error) {
-		console.error(
-			`Error validating stock symbol: ${symbol}`,
-			error.message
-		);
-		throw createError(`Failed to validate stock symbol: ${symbol}.`, 400);
+		console.error("Error validating stock symbol:", error.message || error);
+		throw new Error(`Error validating stock symbol: ${symbol}`);
 	}
 };

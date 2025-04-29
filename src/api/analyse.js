@@ -1,5 +1,6 @@
 import axios from "./axiosInstance.js";
 
+
 export const getStockDatafromExternalAPI = async (symbol) => {
 
 	const storedState = localStorage.getItem("stock-dashboard-store");

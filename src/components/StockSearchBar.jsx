@@ -1,12 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Search, X, Loader } from "lucide-react";
+import { Search, X, Loader, PlusSquare } from "lucide-react";
 import { searchStocksfromExternalAPI } from "../api/analyse";
+import AddStockModal from "./AddStockModal";
 
 const StockSearchBar = ({ onSelect, isExpanded, onClose, className }) => {
 	const [query, setQuery] = useState("");
 	const [results, setResults] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const searchRef = useRef(null);
+	const [showModal, setShowModal] = useState(false);
+	const [stockSymbol, setStockSymbol] = useState("");
 
 	useEffect(() => {
 		const handleClickOutside = (event) => {
@@ -56,8 +59,23 @@ const StockSearchBar = ({ onSelect, isExpanded, onClose, className }) => {
 		}
 	};
 
+	const handleAddstock = (stock) => {
+		console.log(stock)
+		setStockSymbol(stock.symbol);
+		if(stock){
+			setQuery("");
+			setShowModal(true);
+		}
+	};
+
 	return (
-		<div ref={searchRef} className={`relative ${className}`}>
+		<div ref={searchRef} className={`relative ${className} `}>
+			<AddStockModal
+				open={showModal}
+				setOpen={setShowModal}
+				onClose={() => setShowModal(false)}
+				stock={stockSymbol}
+			/>
 			<div className="relative flex items-center font-semibold">
 				<div className="absolute left-3 flex  items-center pointer-events-none">
 					<Search className="h-5 w-5 text-[var(--secondary-400)]" />
@@ -105,8 +123,23 @@ const StockSearchBar = ({ onSelect, isExpanded, onClose, className }) => {
 									{stock.shortname}
 								</div>
 							</div>
-							<div className="text-xs bg-[var(--secondary-200)] text-purple-600 px-2 py-1 rounded">
-								{stock.type || "Stock"}
+							<div className="flex items-center h-full">
+								<div className="text-xs bg-[var(--secondary-200)] text-purple-600 px-2 py-1 rounded">
+									{stock.type || "Stock"}
+								</div>
+								<div className="ml-2 flex items-center">
+									<div
+										className="text-[var(--secondary-400)] hover:text-[var(--secondary-500)] "
+										onClick={(e) => {
+											e.preventDefault();
+											e.stopPropagation();	
+											handleAddstock(stock)
+										}}
+										
+									>
+										<PlusSquare className="h-5 w-5 text-[var(--secondary-400)]" />
+									</div>
+								</div>
 							</div>
 						</button>
 					))}

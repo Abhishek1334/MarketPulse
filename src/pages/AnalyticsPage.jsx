@@ -77,6 +77,7 @@ const AnalyticsPage = () => {
 	);
 
 	useEffect(() => {
+		console.log("symbol", symbol); // Check if symbol is changing unexpectedly
 		if (symbol) {
 			setChartData([]);
 			addToQueue(
@@ -94,6 +95,7 @@ const AnalyticsPage = () => {
 		startDate,
 		endDate,
 	]);
+
 
 	useEffect(() => {
 		if (fetchedStockData?.values?.length) {

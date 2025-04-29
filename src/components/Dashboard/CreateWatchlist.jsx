@@ -3,8 +3,8 @@ import { XCircleIcon } from "lucide-react";
 import { showSuccess, showError } from "@/utils/toast";
 import useStore from "@/context/Store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { validateStockSymbol } from "@/utils/validateStockSymbol";
 import { CreateAWatchlist } from "@/api/watchlist";
+import { validateStockSymbol } from "@/api/stock";
 
 const CreateWatchlist = ({ onClose }) => {
 	const [name, setName] = useState("");
@@ -51,14 +51,25 @@ const CreateWatchlist = ({ onClose }) => {
 		setValidating(true);
 
 		try {
-			const response = await validateStockSymbol(lastStock.symbol);
-			if (response && response.symbol) {
+			const response = await validateStockSymbol(lastStock.symbol.trim());
+			console.log("Validation Response:", response); // Log the response for debugging
+
+			// Check if the message contains 'valid'
+			if (
+				response?.message?.includes("is valid") &&
+				response?.data?.symbol
+			) {
 				const updated = [...stocks];
 				updated[stocks.length - 1].valid = true;
+				updated[stocks.length - 1].symbol =
+					response.data.symbol.toUpperCase(); // Normalize
+
 				setStocks([
 					...updated,
 					{ symbol: "", note: "", targetPrice: "", valid: false },
 				]);
+
+				// Focus on next symbol input
 				setTimeout(() => {
 					const inputs = document.querySelectorAll(
 						"input[placeholder^='Symbol']"
@@ -67,16 +78,18 @@ const CreateWatchlist = ({ onClose }) => {
 						inputs[inputs.length - 1].focus();
 					}
 				}, 50);
-				
 			} else {
+				console.log("Invalid stock symbol:", lastStock.symbol); // Log for debugging
 				throw new Error("Invalid stock symbol.");
 			}
 		} catch (error) {
+			console.log("Validation failed:", error); // Log for debugging
 			showError(error.message || "Invalid stock symbol.");
 		}
-
 		setValidating(false);
 	};
+
+
 
 	const handleStockChange = (index, field, value) => {
 		const updated = [...stocks];

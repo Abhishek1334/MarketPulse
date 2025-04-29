@@ -9,6 +9,7 @@ import {
 
 import {
 	getStocksinWatchlist,
+	AddStockToWatchlist,
 	addMultipleStocksToWatchlist,
 	deleteStockFromWatchlist,
 	updateStockinWatchlist,
@@ -48,7 +49,7 @@ router.put("/:watchlistId", updateWatchlist);
 // @desc    Get all stocks in a specific watchlist
 router.get("/:watchlistId/stocks", getStocksinWatchlist);
 
-
+router.post("/:watchlistId/stock", AddStockToWatchlist)
 
 // @route   POST /api/watchlist/:watchlistId/stocks
 // @desc    Add multiple stocks to a specific watchlist

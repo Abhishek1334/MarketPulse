@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Menu } from "lucide-react";
+import { Search, Menu, LogOut } from "lucide-react";
 import useStore from "../context/Store";
 import StockSearchBar from "./StockSearchBar";
 import ThemeToggle from "./ThemeToggle";
 import { useAnalyticsStore } from "@/context/AnalyticsStore";
-import Logo from "./Homepage/Logo";
+import Icon from "@/components/Icon";
+
 export default function Navbar() {
 	const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -47,16 +48,15 @@ export default function Navbar() {
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between h-16">
 					<div
-						className={`flex items-center justify-between w-full gap-10 max-md:gap-5 ${
+						className={`flex items-center justify-between w-full  gap-10 max-lg:gap-5 ${
 							isSearchExpanded ? "hidden md:flex" : "flex"
 						}`}
 					>
-						<Logo
-							className={`w-15  ${
-								isSearchExpanded ? "hidden" : ""
-							}`}
-						/>
-						<Link to="/" className="flex items-center space-x-2">
+						<Link
+							to={user ? "/dashboard" : "/"}
+							className="flex items-center space-x-2 max-lg:hidden"
+						>
+							<Icon iconSize="12" className={"animate-pulse"} />
 							<span className="text-2xl font-bold text-[var(--text-950)]">
 								MarketPulse
 							</span>
@@ -74,8 +74,8 @@ export default function Navbar() {
 			}`}
 					>
 						<div
-							className={`w-full md:w-96 ${
-								isSearchExpanded ? "flex" : "hidden md:flex"
+							className={`w-full md:w-96 max-md:w-fit ${
+								isSearchExpanded ? "flex" : "hidden md:flex" 
 							}`}
 						>
 							<StockSearchBar
@@ -108,7 +108,7 @@ export default function Navbar() {
 						</button>
 
 						{/* Desktop Navigation */}
-						<div className="hidden md:flex items-center space-x-4">
+						<div className="hidden md:flex items-center space-x-4 h-full w-full">
 							{user ? (
 								<>
 									<Link to="/dashboard" className="nav-link">
@@ -116,9 +116,10 @@ export default function Navbar() {
 									</Link>
 									<button
 										onClick={handleLogout}
-										className="nav-link"
+										className="nav-link inline-flex items-center max-lg:p-3 bg-red-700/70 hover:bg-red-700" 
 									>
-										Logout
+										<span className="max-lg:hidden ">Logout</span>
+										<LogOut className="w-4 h-4  ml-3 max-lg:ml-0" />
 									</button>
 								</>
 							) : (

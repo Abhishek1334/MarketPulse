@@ -1,4 +1,3 @@
-// WatchlistPage.jsx
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { getASingleWatchlist } from "@/api/watchlist";
@@ -73,21 +72,37 @@ const WatchlistPage = () => {
 			<BackButton
 				locationAddress="/dashboard"
 				locationName="Dashboard"
-				className="text-[var(--text-600)] hover:text-[var(--text-800)] transition-colors mb-8"
+				className="text-[var(--text-600)] hover:text-[var(--text-800)] transition-colors mb-4"
 			/>
 
-			<div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-3 gap-4 ">
-				<WatchlistHeader watchlistData={watchlistData || {}} />
-
-				<div className="lg:col-span-3 grid grid-cols-1 lg:grid-cols-3 gap-8 overflow-hidden ">
-					<div className="lg:col-span-2 ">
+			<div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 flex-1 overflow-hidden">
+				{" "}
+				{/* Changed to flex-col on smaller screens */}
+				{/* Watchlist Header */}
+				<div className="lg:col-span-3 mb-4">
+					<WatchlistHeader watchlistData={watchlistData || {}} />
+				</div>
+				{/* Stock List and Stock Preview Box */}
+				<div className="lg:col-span-3 lg:flex lg:gap-8 overflow-hidden">
+					{" "}
+					{/* Use flex on larger screens */}
+					{/* Stock List */}
+					<div
+						className="lg:flex-1 overflow-auto"
+						style={{ minHeight: "300px" }}
+					>
+						{" "}
+						{/* Removed max-h, added min-height */}
 						<StockList
 							watchlistId={watchlistId}
 							loading={isLoading}
 							handlePreviewStock={handlePreviewStock}
 						/>
 					</div>
-					<div className="lg:col-span-1 ">
+					{/* Stock Preview Box */}
+					<div className="lg:w-[300px] flex-shrink-0 overflow-auto">
+						{" "}
+						{/* Fixed width for preview on larger screens */}
 						<StockPreviewBox
 							previewStock={previewStock}
 							setPreviewStock={setPreviewStock}
