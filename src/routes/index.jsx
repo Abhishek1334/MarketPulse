@@ -5,17 +5,17 @@ import RegisterPage from "../pages/RegisterPage";
 import DashboardPage from "../pages/DashboardPage";
 import WatchlistPage from "../pages/WatchlistPage";
 import AnalyticsPage from "../pages/AnalyticsPage";
-import HomePage from "../pages/Homepage";
 import ProtectedRoute from "./ProtectedRoute";
+import HomePage from "../pages/Homepage";
 import Layout from "../components/Layout";
-
+import NotFoundPage from "@/pages/NotFoundPage";
 export const router = createBrowserRouter([
 	{
 		path: "/",
 		element: <App />,
 		children: [
 			{
-				path: "",
+				path: "/",
 				element: <HomePage />,
 			},
 			{
@@ -25,6 +25,10 @@ export const router = createBrowserRouter([
 			{
 				path: "register",
 				element: <RegisterPage />,
+			},
+			{
+				path: "*",
+				element: <NotFoundPage />,
 			},
 			{
 				element: <ProtectedRoute />, // Protect the routes that require authentication

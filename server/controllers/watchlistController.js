@@ -40,7 +40,7 @@ export const createWatchlist = async (req, res) => {
 					throw createError(`Duplicate stock symbol: ${symbol}`, 400);
 				}
 
-				// ✅ Validate stock symbol via API or service
+				// Validate stock symbol via search API
 				const data = await validateStockSymbol(symbol);
 
 				if (
@@ -79,6 +79,7 @@ export const createWatchlist = async (req, res) => {
 		throw createError(error.message || "Failed to create watchlist.", 500);
 	}
 };
+
 
 // GET api/watchlist
 export const getWatchlistsByUser = async (req, res) => {

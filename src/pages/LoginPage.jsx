@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { LoginUser } from "../api/auth.js";
 import useStore from "../context/Store.js";
-import { showSuccess, showError } from "../utils/toast";
+import { showSuccess, showError } from "../utils/toast.js";
 import { Eye, EyeClosed } from "lucide-react";
-import Logo from "../components/Homepage/Logo";
+import Icon from "../components/Icon.jsx";
+
 const LoginPage = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -14,7 +15,6 @@ const LoginPage = () => {
 	const navigate = useNavigate();
 	const login = useStore((state) => state.login);
 	const user = useStore((state) => state.user);
-
 	
 	useEffect(() => {
 		if (user) navigate("/dashboard");
@@ -52,10 +52,13 @@ const LoginPage = () => {
 
 	return (
 		<div className="bg-[var(--background-50)] flex flex-col h-screen justify-center items-center px-4 transition-all duration-1000 ease-in-out">
-			<Logo className="mb-8 cursor-pointer"  />
-
 			<div className="bg-[var(--background-950)] shadow-lg p-8 rounded-2xl max-w-sm w-full text-[var(--text-50)]">
-				<h1 className="text-3xl font-bold mb-6 text-center ">Login</h1>
+				<div className="flex flex-col items-center">
+					<Icon iconSize="20" iconColor="dark" className={"mb-2 cursor-pointer"} />
+					<h1 className="text-3xl font-bold mb-6 text-center ">
+						Login
+					</h1>
+				</div>
 				<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
 					<input
 						type="email"

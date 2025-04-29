@@ -7,11 +7,10 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
-import { AddStocksToWatchlist } from "@/api/stock";
+import { AddStockToWatchlist } from "@/api/stock";
 import { showError, showSuccess } from "@/utils/toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useStore from "@/context/Store";
-import { set } from "mongoose";
 
 export default function AddStockModal({ watchlistId }) {
 	const [symbol, setSymbol] = useState("");
@@ -29,7 +28,7 @@ export default function AddStockModal({ watchlistId }) {
 		error: addError,
 	} = useMutation({
 		mutationFn: async () => {
-			const response = await AddStocksToWatchlist(
+			const response = await AddStockToWatchlist(
 				watchlistId,
 				symbol,
 				note,
