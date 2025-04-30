@@ -1,40 +1,47 @@
-import React from "react";
+// DatePicker.jsx
+import React, { useState, useEffect } from "react";
+import { useAnalyticsStore } from "@/context/AnalyticsStore";
 
-const DatePicker = ({
-	startDate,
-	setStartDate,
-	endDate,
-	setEndDate,
-	handleConfirmDateChange,
-}) => {
+const DatePicker = () => {
+	const { startDate, endDate, setStartDate, setEndDate } =
+		useAnalyticsStore();
+	const [localStart, setLocalStart] = useState(startDate);
+	const [localEnd, setLocalEnd] = useState(endDate);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			const newStart = new Date(localStart);
+			const newEnd = new Date(localEnd);
+
+			if (newStart > new Date()) newStart = new Date();
+			if (newEnd > new Date()) newEnd = new Date();
+			if (newStart > newEnd) return;
+
+			setStartDate(newStart.toISOString().split("T")[0]);
+			setEndDate(newEnd.toISOString().split("T")[0]);
+		}, 500);
+
+		return () => clearTimeout(timer);
+	}, [localStart, localEnd]);
+
 	return (
 		<div className="flex flex-wrap gap-4 items-center">
-			<label className="text-sm font-medium text-[var(--text-700)]">
+			<label>
 				Start Date:
 				<input
 					type="date"
-					value={startDate}
-					onChange={(e) => setStartDate(e.target.value)}
-					className="ml-2 px-2 py-1 border bg-[var(--background-50)] border-gray-300 rounded-md text-[var(--text-950)]"
+					value={localStart}
+					onChange={(e) => setLocalStart(e.target.value)}
 				/>
 			</label>
-			<label className="text-sm font-medium text-[var(--text-700)]">
+			<label>
 				End Date:
 				<input
 					type="date"
-					value={endDate}
-					onChange={(e) => setEndDate(e.target.value)}
-					className="ml-2 px-2 py-1 border border-gray-300 rounded-md
-											bg-[var(--background-50)] text-[var(--text-950)] "
+					value={localEnd}
+					onChange={(e) => setLocalEnd(e.target.value)}
 				/>
 			</label>
-			{/* Confirm Button */}
-			<button
-				onClick={handleConfirmDateChange}
-				className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg"
-			>
-				Confirm Date Change
-			</button>
 		</div>
 	);
 };

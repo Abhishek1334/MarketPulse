@@ -1,34 +1,28 @@
 import React from "react";
-const timeframes = ["1D", "1W", "1M"];
+import clsx from "clsx";
 import { useAnalyticsStore } from "@/context/AnalyticsStore";
 
 const TimeframePicker = () => {
-	const { timeframe: selectedTimeframe, setTimeframe } = useAnalyticsStore();
+	const { timeframe, setTimeframe } = useAnalyticsStore();
 
-	const handleButtonClick = (timeframe, event) => {
-		event.preventDefault(); // Prevent form or default behavior
-		setTimeframe(timeframe);
+	const handleChange = (newTimeframe) => (e) => {
+		e.preventDefault();
+		setTimeframe(newTimeframe);
 	};
 
 	return (
-		<div className="flex gap-2 max-sm:overflow-x-auto scrollbar-hide max-w-full pb-2 ">
-			{timeframes.map((timeframe) => (
+		<div className="flex gap-2 max-sm:overflow-x-auto scrollbar-hide max-w-full pb-2">
+			{["1D", "1W", "1M"].map((tf) => (
 				<button
-					key={timeframe}
-					type="button" // This prevents the page reload
-					onClick={(e) => handleButtonClick(timeframe, e)} // Pass event to prevent default behavior
-					className={`px-3 py-1.5 whitespace-nowrap rounded-lg text-sm font-medium transition-colors
-									${
-										selectedTimeframe === timeframe
-											? "bg-indigo-600 text-white"
-											: "bg-gray-100 text-gray-600 hover:bg-gray-200"
-									}`}
+					key={tf}
+					type="button"
+					onClick={handleChange(tf)}
+					className={clsx(/* ... */)}
 				>
-					{timeframe}
+					{tf}
 				</button>
 			))}
 		</div>
 	);
 };
-
 export default TimeframePicker;

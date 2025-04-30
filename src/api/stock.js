@@ -50,7 +50,6 @@ export const AddStockToWatchlist = async (watchlistId, symbol, note, targetPrice
 	if (!targetPrice) {
 		targetPrice = "";
 	}
-	console.log(watchlistId, symbol, note, targetPrice);
 
 	const storedState = localStorage.getItem("stock-dashboard-store");
 	const parsedState = storedState ? JSON.parse(storedState) : null;
@@ -74,7 +73,6 @@ export const AddStockToWatchlist = async (watchlistId, symbol, note, targetPrice
 				},
 			}
 		);
-		console.log(response.data);
 		return response.data;
 	} catch (error) {
 		console.error("Error Response:", error.response.data);
@@ -103,7 +101,6 @@ export const AddStocksToWatchlist = async (watchlistId, symbol, note, targetPric
 	if(!targetPrice){
 		targetPrice = "";
 	}
-	console.log(watchlistId, symbol, note, targetPrice);
 	const storedState = localStorage.getItem("stock-dashboard-store");
 	const parsedState = storedState ? JSON.parse(storedState) : null;
 	const token = parsedState?.state?.user?.token;
@@ -122,7 +119,6 @@ export const AddStocksToWatchlist = async (watchlistId, symbol, note, targetPric
 				"Authorization": `Bearer ${token}`,
 			},
 		});
-		console.log(response.data);
 		return response.data;
 	} catch (error) {
 		console.error("Error Response:", error.response.data);

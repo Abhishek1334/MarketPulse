@@ -1,7 +1,6 @@
 import axios from "./axiosInstance.js";
 
 export const LoginUser = async (email, password) => {
-	console.log("API URL in loginUser:", import.meta.env.VITE_API_URL);
 	try {
 		if (!email || !password) {
 			throw new Error("All the fields are required.");

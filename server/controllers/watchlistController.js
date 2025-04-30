@@ -81,16 +81,16 @@ export const createWatchlist = async (req, res) => {
 };
 
 
-// GET api/watchlist
 export const getWatchlistsByUser = async (req, res) => {
 	try {
 		const Watchlists = await watchlist.find({ user: req.user._id });
 		res.status(200).json(Watchlists);
 	} catch (error) {
 		console.error("Error getting watchlists:", error);
+		// Add more specific error logging here
 		throw createError("Internal Server Error", 500);
 	}
-}
+};
 
 
 // GET api/watchlist/:watchlistId

@@ -2,58 +2,6 @@ import axios from "axios";
 import { createError } from "../utils/createError.js";
 import { validateStockSymbol } from "../utils/validateStockSymbol.js";
 import yahooFinance from "yahoo-finance2";
-// Extract the crumb from the cookies or page content
-const getCrumbFromCookies = (cookies) => {
-	if (!cookies) return null;
-
-	const crumbCookie = cookies.find((cookie) => cookie.includes("crumb="));
-	if (crumbCookie) {
-		const match = crumbCookie.match(/crumb=([a-zA-Z0-9.]+)/);
-		return match ? match[1] : null;
-	}
-
-	return null;
-};
-
-export const getCrumb = async () => {
-	try {
-		// Send a request to Yahoo Finance's stock page with custom headers to simulate a browser request
-		const response = await axios.get(
-			"https://finance.yahoo.com/quote/AAPL",
-			{
-				headers: {
-					"User-Agent":
-						"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-					"Accept-Language": "en-US,en;q=0.9",
-					"Accept-Encoding": "gzip, deflate, br",
-					Connection: "keep-alive",
-				},
-				maxRedirects: 5, // Limit the number of redirects
-			}
-		);
-
-		console.log("Response Status Code:", response.status); // Log the status code
-		console.log("Response Headers:", response.headers); // Log the entire headers
-		if (response.headers["content-type"].includes("text/html")) {
-			console.log("Received an HTML page instead of expected data.");
-		}
-
-		const cookies = response.headers["set-cookie"];
-		console.log("Cookies Received:", cookies); // Log the cookies
-
-		const crumb = getCrumbFromCookies(cookies);
-		console.log("Extracted Crumb:", crumb); // Log the extracted crumb
-
-		if (!crumb) {
-			throw new Error("Unable to find crumb.");
-		}
-
-		return crumb;
-	} catch (error) {
-		console.error("Error fetching crumb:", error);
-		throw error; // Rethrow the error to handle it upstream
-	}
-};
 
 
 export const getStockData = async (req, res, next) => {
@@ -66,7 +14,7 @@ export const getStockData = async (req, res, next) => {
 	try {
 		// Validate the stock symbol first
 		const data = await validateStockSymbol(symbol);
-
+		
 		// Fetch stock data after validation
 		const response = await axios.get(
 			`https://api.twelvedata.com/quote?symbol=${symbol}&apikey=${process.env.TWELVE_DATA_API_KEY}`
@@ -88,12 +36,10 @@ export const validateStock = async (req, res) => {
 			throw createError("Stock symbol is required.", 400);
 		}
 
-		console.log("Validating stock symbol:", symbol);
 
 		// Validate the stock symbol using the updated function
 		const data = await validateStockSymbol(symbol);
 
-		console.log("Validation result:", data);
 
 		// Check if the validation result is invalid
 		if (!data || data.code || data.message || data.status === "error") {
@@ -148,58 +94,116 @@ export const getStockDataforWatchlist = async (req, res, next) => {
 		next(createError("Failed to fetch stock data", 500));
 	}
 };
-
-export const getStockChartData = async (req, res) => {
+export const getStockChartData = async (req, res, next) => {
 	try {
-		const {
-			symbol,
-			interval = "1d",
-			range,
-			startDate,
-			endDate,
-		} = req.query;
+		const { symbol, interval = "1d", startDate, endDate } = req.query;
 
+		// Validate required parameters
 		if (!symbol || !startDate || !endDate) {
 			throw createError(
-				"Symbol, start date, and end date are required.",
-				400
+				400,
+				"Symbol, startDate, and endDate are required"
 			);
 		}
 
-		// Fetch historical stock data
-		const results = await yahooFinance.historical(symbol, {
-			period1: startDate, // e.g., '2024-04-01'
-			period2: endDate, // e.g., '2024-04-25'
-			interval, // e.g., '1d', '1wk'
-			range,
-		});
+		// Validate stock symbol format
+		if (!/^[A-Za-z]{1,5}$/.test(symbol)) {
+			throw createError(400, "Invalid stock symbol format");
+		}
 
-		// Format for frontend
-		const values = results.map((item) => ({
-			datetime: item.date.toISOString().split("T")[0],
-			open: item.open.toFixed(2),
-			high: item.high.toFixed(2),
-			low: item.low.toFixed(2),
-			close: item.close.toFixed(2),
-			volume: item.volume.toString(),
-		}));
+		// Convert and validate dates
+		const currentDate = new Date();
+		const start = new Date(startDate);
+		const end = new Date(endDate);
 
-		const meta = {
-			symbol,
+		if (isNaN(start)) throw createError(400, "Invalid startDate format");
+		if (isNaN(end)) throw createError(400, "Invalid endDate format");
+		if (start > currentDate || end > currentDate) {
+			throw createError(400, "Cannot request future dates");
+		}
+		if (start >= end) {
+			throw createError(400, "End date must be after start date");
+		}
+
+		// Convert to UNIX timestamps
+		const period1 = Math.floor(start.getTime() / 1000);
+		const period2 = Math.floor(end.getTime() / 1000);
+		
+		// Fetch data from Yahoo Finance
+		const chartData = await yahooFinance.chart(symbol, {
+			period1,
+			period2,
 			interval,
-			currency: "USD", // Static (Yahoo always gives in USD)
-			exchange_timezone: "America/New_York",
-			exchange: "NASDAQ",
-			mic_code: "XNGS",
-			type: "Common Stock",
+			includePrePost: false,
+		});
+	// Validate response structure
+		if (!chartData?.quotes || !Array.isArray(chartData.quotes)) {
+			throw createError(502, "Invalid data format from financial API");
+		}
+
+		// Process and validate quotes
+		const values = chartData.quotes
+			.map((quote) => {
+				try {
+					return {
+						datetime:
+							quote.date?.toISOString().split("T")[0] || null,
+						open: parseFloat(quote.open?.toFixed(2)) || null,
+						high: parseFloat(quote.high?.toFixed(2)) || null,
+						low: parseFloat(quote.low?.toFixed(2)) || null,
+						close: parseFloat(quote.close?.toFixed(2)) || null,
+						volume: parseInt(quote.volume) || null,
+					};
+				} catch (error) {
+					console.warn("Failed to process quote:", quote);
+					return null;
+				}
+			})
+			.filter(
+				(item) =>
+					item?.datetime &&
+					item.open !== null &&
+					item.high !== null &&
+					item.low !== null &&
+					item.close !== null
+			);
+
+		if (values.length === 0) {
+			throw createError(
+				404,
+				"No valid price data found for the selected range"
+			);
+		}
+
+		// Build metadata
+		const meta = {
+			symbol: chartData.meta?.symbol || symbol.toUpperCase(),
+			exchange: chartData.meta?.fullExchangeName || "Unknown Exchange",
+			currency: chartData.meta?.currency || "USD",
+			timezone: chartData.meta?.exchangeTimezoneName || "UTC",
+			dataGranularity: chartData.meta?.dataGranularity || interval,
 		};
 
-		res.status(200).json({ meta, values });
+		res.status(200).json({
+			success: true,
+			meta,
+			values,
+			warning:
+				chartData.quotes.length !== values.length
+					? "Some data points were filtered due to invalid format"
+					: undefined,
+		});
 	} catch (error) {
-		console.error("Error fetching stock chart data :", error);
-		throw createError("Internal Server Error", 500);
+		console.error(`Chart data error for ${symbol}:`, error);
+		next(
+			createError(
+				error.status || 500,
+				error.message || "Failed to fetch chart data"
+			)
+		);
 	}
 };
+
 
 export const searchStock = async (req, res, next) => {
 	try {
