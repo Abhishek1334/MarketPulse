@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 5000;
 const mongoURI = process.env.MONGO_URI;
 
 const corsOptions = {
-	origin: ["http://localhost:5173", "https://marketpulse.vercel.app"], //  Replace with your Vercel origin
+	origin: ["http://localhost:5173", "https://market-pulse-two.vercel.app"], //  Replace with your Vercel origin
 	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 	allowedHeaders: ["Content-Type", "Authorization"], //  Include 'Authorization' if you use it
 	credentials: true, //  This is crucial
