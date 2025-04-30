@@ -9,7 +9,6 @@ import stocksRoutes from "./routes/stocksRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 dotenv.config();
-const app = express();
 
 const PORT = process.env.PORT || 5000;
 const mongoURI = process.env.MONGO_URI;
@@ -23,6 +22,7 @@ const corsOptions = {
 
 // Use CORS middleware
 app.use(cors(corsOptions));
+const app = express();
 
 // Use express.json() for body parsing
 app.use(express.json());
