@@ -1,6 +1,6 @@
 const WatchlistHeader = ({ watchlistData }) => {
 	return (
-		<div className="col-span-full bg-gradient-to-r from-[var(--primary-50)] to-[var(--primary-200)] rounded-2xl shadow-lg px-8 py-2 transition-all duration-500 ease-in-out h-fit">
+		<div className=" bg-gradient-to-r from-[var(--primary-50)] to-[var(--primary-200)] rounded-2xl shadow-lg px-8 py-2 transition-all duration-500 ease-in-out h-fit">
 			<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
 				<h1 className="text-3xl font-bold text-[var(--text-900)]">
 					{watchlistData.name || "Loading Watchlist..."}
