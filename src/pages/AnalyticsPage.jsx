@@ -1,191 +1,117 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { useParams } from "react-router-dom";
-import {
-	Chart as ChartJS,
-	CategoryScale,
-	LinearScale,
-	PointElement,
-	LineElement,
-	Title,
-	Tooltip,
-	Legend,
-	Filler,
-} from "chart.js";
-
+import React, { useEffect, useMemo, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import useRateLimitedFetch from "../service/RateLimiting";
-import useStore from "@/context/Store";
 import { useAnalyticsStore } from "@/context/AnalyticsStore";
-
-import StockDetailsCard from "@/components/Analytics/StockDetailsCard";
-import MarketHoursCard from "@/components/Analytics/MarketHoursCard";
-import ChartSection from "@/components/Analytics/ChartSection";
-import VolumeAnalysis from "@/components/Analytics/VolumeAnalysis";
-import TechnicalIndicators from "@/components/Analytics/TechnicalIndicators";
-import TimeframePicker from "@/components/Analytics/TimeframePicker";
-import AnalyticsHeader from "@/components/Analytics/AnalyticsHeader";
-import BackButton from "@/components/BackButton";
-
-ChartJS.register(
-	CategoryScale,
-	LinearScale,
-	PointElement,
-	LineElement,
-	Title,
-	Tooltip,
-	Legend,
-	Filler
-);
-
-const timeframeToYahooParams = {
-	"1D": { interval: "1d", range: "1mo" },
-	"1W": { interval: "1wk", range: "6mo" },
-	"1M": { interval: "1mo", range: "max" },
-};
 
 const AnalyticsPage = () => {
 	const { symbol } = useParams();
-	const {
-		startDate,
-		endDate,
-		setStartDate,
-		setEndDate,
-		setMetric,
-		timeframe: selectedTimeframe,
-		metric: selectedMetric,
-	} = useAnalyticsStore();
-
-	const { watchlists } = useStore((state) => state);
-
-	const stockInWatchlist = watchlists
-		.flatMap((watchlist) => watchlist.stocks)
-		.find((stock) => stock.symbol === symbol);
-
-	const [chartData, setChartData] = useState([]);
-
-	const { addToQueue, results, isLoading, isError, error } =
-		useRateLimitedFetch();
-
-	const selectedParams = timeframeToYahooParams[selectedTimeframe];
-
-	const requestKey = `${symbol}-${selectedParams.interval}-${
-		selectedParams.range
-	}-${startDate || ""}-${endDate || ""}`;
-
-	const fetchedStockData = useMemo(
-		() => results[requestKey],
-		[results, requestKey]
+	const [processedData, setProcessedData] = useState([]);
+	const { addToQueue, results, isFetching } = useRateLimitedFetch();
+	const navigate = useNavigate();
+	// Default filter values
+	const defaultFilters = useMemo(
+		() => ({
+			interval: "1d",
+			startDate: new Date(Date.now() - 30 * 86400000)
+				.toISOString()
+				.split("T")[0],
+			endDate: new Date().toISOString().split("T")[0],
+		}),
+		[]
 	);
 
+	// Generate request key
+	const requestKey = useMemo(
+		() =>
+			`${symbol}-${defaultFilters.interval}-${defaultFilters.startDate}-${defaultFilters.endDate}`,
+		[symbol, defaultFilters]
+	);
+
+	// Fetch data on mount and symbol change
 	useEffect(() => {
-		console.log("symbol", symbol); // Check if symbol is changing unexpectedly
-		if (symbol) {
-			setChartData([]);
-			addToQueue(
-				symbol,
-				selectedParams.interval,
-				selectedParams.range,
-				startDate,
-				endDate
-			);
-		}
-	}, [
-		symbol,
-		selectedParams.interval,
-		selectedParams.range,
-		startDate,
-		endDate,
-	]);
+		addToQueue(
+			symbol,
+			defaultFilters.interval,
+			defaultFilters.startDate,
+			defaultFilters.endDate
+		);
+	}, [requestKey, addToQueue, symbol, defaultFilters]);
 
-
+	// Process data when results change
 	useEffect(() => {
-		if (fetchedStockData?.values?.length) {
-			const data = fetchedStockData.values.map((item) => ({
-				name: item.datetime,
-				open: parseFloat(item.open),
-				high: parseFloat(item.high),
-				low: parseFloat(item.low),
-				close: parseFloat(item.close),
-				volume: parseFloat(item.volume),
-			}));
-			setChartData(data);
-		}
-	}, [fetchedStockData]);
+		const rawData = results[requestKey]?.values || [];
+		const cleanData = rawData
+			.map((item) => ({
+				date: new Date(item.datetime),
+				open: Number(item.open),
+				high: Number(item.high),
+				low: Number(item.low),
+				close: Number(item.close),
+				volume: Number(item.volume),
+			}))
+			.filter((item) => !isNaN(item.close));
+		console.log("Processed data:", cleanData);
+		setProcessedData(cleanData);
+	}, [results, requestKey]);
 
-	const handleMetricChange = (metric) => setMetric(metric);
-
-	const latest = chartData.at(-1)?.[selectedMetric];
-	const prev = chartData.at(-2)?.[selectedMetric];
-	const priceChange = latest && prev ? ((latest - prev) / prev) * 100 : null;
-	const isUp = priceChange > 0;
-
-	if (isError) {
-		return (
-			<div className="flex flex-col gap-4 justify-center items-center h-[90vh] text-lg text-red-600">
-				{error?.message || "Something went wrong fetching stock data."}
-				<BackButton locationAddress="" locationName="Watchlist" />
-			</div>
-		);
-	}
-
-	if (isLoading || !fetchedStockData) {
-		return (
-			<div className="flex flex-col gap-4 justify-center items-center h-[90vh] text-lg text-gray-600">
-				<div className="animate-spin rounded-full size-10 border-t-2 border-b-2 border-gray-600"></div>
-				Loading...
-			</div>
-		);
-	}
-
-	const metrics = ["open", "high", "low", "close", "volume"];
+	// Get latest price info
+	const latestPrice = useMemo(
+		() => processedData[0]?.close.toFixed(2) || "--",
+		[processedData]
+	);
 
 	return (
-		<div className="bg-[var(--background-100)] p-4 md:p-6 lg:p-8">
-			<div className="max-w-7xl mx-auto space-y-6">
-				<BackButton locationAddress="" locationName="" />
-
-				{/* Header */}
-				<div className="flex max-md:flex-col max-md:flex-wrap max-md:gap-4 items-center justify-between bg-[var(--background-50)] rounded-xl shadow-sm p-4 md:p-6">
-					<AnalyticsHeader
-						symbol={symbol}
-						exchange={fetchedStockData?.meta?.exchange || ""}
-						latest={latest}
-						priceChange={priceChange}
-						isUp={isUp}
-					/>
-					<TimeframePicker />
-				</div>
-
-				<div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-					{/* Stock Details Card */}
-					<div className="lg:col-span-3 space-y-6">
-						{stockInWatchlist && (
-							<StockDetailsCard stock={stockInWatchlist} />
-						)}
-						<MarketHoursCard />
-					</div>
-
-					{/* Chart Section */}
-					<div className="lg:col-span-9 space-y-6">
-						<ChartSection
-							chartData={chartData}
-							isLoading={isLoading}
-							selectedMetric={selectedMetric}
-							handleMetricChange={handleMetricChange}
-							metrics={metrics}
-							startDate={startDate}
-							setStartDate={setStartDate}
-							endDate={endDate}
-							setEndDate={setEndDate}
-						/>
-
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-							<VolumeAnalysis />
-							<TechnicalIndicators />
-						</div>
-					</div>
-				</div>
-			</div>
+		<div className="flex flex-col items-center justify-center h-[90vh]">
+			{/* Show under construction message */}
+			<h1 className="text-3xl font-bold ">Under Construction</h1>
+			<p className="text-lg font-medium">This page is currently under construction.</p>
+			<button onClick={() => navigate(-1)} className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md px-6 py-3 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">Go Back</button>
 		</div>
+		// <div className="analytics-container">
+		// 	<header className="analytics-header">
+		// 		<h1>{symbol} Analytics</h1>
+		// 		<div className="price-display">
+		// 			<span className="price">{latestPrice}</span>
+		// 		</div>
+		// 	</header>
+
+		// 	<main className="analytics-content">
+		// 		<div className="chart-container">
+		// 			<div className="chart-placeholder">
+		// 				{/* Empty space for future chart implementation */}
+		// 			</div>
+		// 		</div>
+
+		// 		<div className="info-cards">
+		// 			<div className="info-card">
+		// 				<h3>Latest Session</h3>
+		// 				{processedData[0] ? (
+		// 					<ul>
+		// 						<li>
+		// 							Open: ${processedData[0].open.toFixed(2)}
+		// 						</li>
+		// 						<li>
+		// 							High: ${processedData[0].high.toFixed(2)}
+		// 						</li>
+		// 						<li>Low: ${processedData[0].low.toFixed(2)}</li>
+		// 						<li>
+		// 							Volume:{" "}
+		// 							{processedData[0].volume.toLocaleString()}
+		// 						</li>
+		// 					</ul>
+		// 				) : (
+		// 					<p>No data available</p>
+		// 				)}
+		// 			</div>
+
+		// 			<div className="info-card">
+		// 				<h3>Market Status</h3>
+		// 				<p className="market-open">Market is Open</p>
+		// 				<p>Hours: 9:30 AM - 4:00 PM EST</p>
+		// 			</div>
+		// 		</div>
+		// 	</main>
+		// </div>
 	);
 };
 

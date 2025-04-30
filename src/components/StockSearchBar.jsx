@@ -60,7 +60,6 @@ const StockSearchBar = ({ onSelect, isExpanded, onClose, className }) => {
 	};
 
 	const handleAddstock = (stock) => {
-		console.log(stock)
 		setStockSymbol(stock.symbol);
 		if(stock){
 			setQuery("");

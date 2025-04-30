@@ -73,13 +73,11 @@ export const getStockDataforWatchlist = async (symbols) => {
 export const getTimeSeriesStockDatafromExternalAPI = async (
 	symbol,
 	interval = "1d",
-	range,
 	startDate,
 	endDate
 ) => {
 	const storedState = localStorage.getItem("stock-dashboard-store");
 	const parsedState = storedState ? JSON.parse(storedState) : null;
-	
 	const token = parsedState?.state?.user?.token;
 
 	if (!token) {
@@ -89,11 +87,10 @@ export const getTimeSeriesStockDatafromExternalAPI = async (
 	if (!symbol) {
 		throw new Error("Symbol is required.");
 	}
-	
 
 	try {
 		const response = await axios.get(
-			`/stock/chart?symbol=${symbol}&interval=${interval}&startDate=${startDate}&endDate=${endDate}&range=${range}`,
+			`/stock/chart?symbol=${symbol}&interval=${interval}&startDate=${startDate}&endDate=${endDate}`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -101,7 +98,9 @@ export const getTimeSeriesStockDatafromExternalAPI = async (
 			}
 		);
 
-		return response.data;
+		console.log("Response data from external API:", response.data);
+
+		return response.data; // Return the entire response.data object
 	} catch (error) {
 		console.error(
 			"Error fetching chart data:",
@@ -113,7 +112,6 @@ export const getTimeSeriesStockDatafromExternalAPI = async (
 		);
 	}
 };
-
 
 
 export const searchStocksfromExternalAPI = async (query) => {

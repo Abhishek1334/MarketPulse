@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+// service/RateLimiting.jsx
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { getTimeSeriesStockDatafromExternalAPI } from "../api/analyse";
 
-const CACHE_TTL = 1000 * 60 * 5; // 5 minutes
+const CACHE_TTL = 1000 * 60 * 5;
 const stockDataCache = {};
 let apiCallsInCurrentMinute = 0;
 let apiCallsToday = 0;
@@ -9,16 +10,23 @@ let apiCallsToday = 0;
 const MAX_REQUESTS_PER_MINUTE = 8;
 const MAX_REQUESTS_PER_DAY = 800;
 
-const makeCacheKey = (symbol, interval, range, startDate, endDate) =>
-	`${symbol}-${interval}-${range}-${startDate || "noStart"}-${
-		endDate || "noEnd"
+export const makeCacheKey = (symbol, interval, startDate, endDate) => {
+	const format = (date) => date && new Date(date).toISOString().split("T")[0];
+	return `${symbol}-${interval}-${format(startDate) || "noStart"}-${
+		format(endDate) || "noEnd"
 	}`;
+};
 
 const useRateLimitedFetch = () => {
 	const [queue, setQueue] = useState([]);
 	const [results, setResults] = useState({});
 	const [isFetching, setIsFetching] = useState(false);
 	const isMountedRef = useRef(true);
+	const queueRef = useRef(queue);
+
+	useEffect(() => {
+		queueRef.current = queue;
+	}, [queue]);
 
 	useEffect(() => {
 		isMountedRef.current = true;
@@ -28,132 +36,145 @@ const useRateLimitedFetch = () => {
 	}, []);
 
 	const fetchData = useCallback(
-		async (symbol, interval = "1d", range = "1mo", startDate, endDate) => {
-			const key = makeCacheKey(
-				symbol,
-				interval,
-				range,
-				startDate,
-				endDate
-			);
+		async (symbol, interval = "1d", startDate, endDate) => {
+			const key = makeCacheKey(symbol, interval, startDate, endDate);
 			const cached = stockDataCache[key];
 			const now = Date.now();
 
 			if (cached && now - cached.timestamp < CACHE_TTL) {
-				return cached.data;
+				return { success: true, data: cached.data };
 			}
 
-			if (apiCallsInCurrentMinute >= MAX_REQUESTS_PER_MINUTE) return null;
-			if (apiCallsToday >= MAX_REQUESTS_PER_DAY) return null;
+			if (apiCallsInCurrentMinute >= MAX_REQUESTS_PER_MINUTE) {
+				return {
+					success: false,
+					error: "Rate limit exceeded (minute)",
+				};
+			}
+			if (apiCallsToday >= MAX_REQUESTS_PER_DAY) {
+				return { success: false, error: "Rate limit exceeded (day)" };
+			}
 
 			try {
-				const data = await getTimeSeriesStockDatafromExternalAPI(
+				const response = await getTimeSeriesStockDatafromExternalAPI(
 					symbol,
 					interval,
-					range,
 					startDate,
 					endDate
 				);
 
-				if (data && !data.status?.includes("error")) {
-					stockDataCache[key] = { data, timestamp: now };
+				if (response && !response.status?.includes("error")) {
+					stockDataCache[key] = { data: response, timestamp: now };
 					apiCallsInCurrentMinute++;
 					apiCallsToday++;
-					return data;
+					return { success: true, data: response };
 				}
 
-				return null;
+				return { success: false, error: "Failed to fetch data" };
 			} catch (error) {
 				console.error("Fetch error:", error);
-				return null;
+				return { success: false, error: error.message };
 			}
 		},
 		[]
 	);
 
-	useEffect(() => {
-		if (!isFetching && queue.length > 0) {
-			const { symbol, interval, range, startDate, endDate } = queue[0];
-			const key = makeCacheKey(
-				symbol,
-				interval,
-				range,
-				startDate,
-				endDate
-			);
-
+	const processQueue = useCallback(async () => {
+		if (
+			!isFetching &&
+			queueRef.current.length > 0 &&
+			isMountedRef.current
+		) {
 			setIsFetching(true);
+			const [nextRequest] = queueRef.current;
 
-			(async () => {
-				const data = await fetchData(
-					symbol,
-					interval,
-					range,
-					startDate,
-					endDate
+			try {
+				const result = await fetchData(
+					nextRequest.symbol,
+					nextRequest.interval,
+					nextRequest.startDate,
+					nextRequest.endDate
 				);
-				if (isMountedRef.current && data) {
-					setResults((prev) => ({ ...prev, [key]: data }));
-				}
+
 				if (isMountedRef.current) {
+					const key = makeCacheKey(
+						nextRequest.symbol,
+						nextRequest.interval,
+						nextRequest.startDate,
+						nextRequest.endDate
+					);
+
+					// Update both cache and results state
+					setResults((prev) => ({
+						...prev,
+						[key]: result.success
+							? result.data
+							: { error: result.error },
+					}));
+
 					setQueue((prev) => prev.slice(1));
+				}
+			} finally {
+				if (isMountedRef.current) {
 					setIsFetching(false);
 				}
-			})();
+			}
 		}
-	}, [queue, isFetching, fetchData]);
+	}, [fetchData, isFetching]);
+
+	useEffect(() => {
+		const interval = setInterval(processQueue, 100);
+		return () => clearInterval(interval);
+	}, [processQueue]);
 
 	const addToQueue = useCallback(
-		(symbol, interval = "1d", range = "1mo", startDate, endDate) => {
-			const exists = queue.some(
-				(item) =>
-					item.symbol === symbol &&
-					item.interval === interval &&
-					item.range === range &&
-					item.startDate === startDate &&
-					item.endDate === endDate
-			);
+		(symbol, interval = "1d", startDate, endDate) => {
+			const key = makeCacheKey(symbol, interval, startDate, endDate);
 
-			if (!exists) {
-				setQueue((prev) => [
-					...prev,
-					{ symbol, interval, range, startDate, endDate },
-				]);
-			}
+			setQueue((prev) => {
+				const existsInQueue = prev.some(
+					(item) =>
+						makeCacheKey(
+							item.symbol,
+							item.interval,
+							item.startDate,
+							item.endDate
+						) === key
+				);
+
+				if (existsInQueue) return prev;
+
+				const cached = stockDataCache[key];
+				if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+					setResults((prevResults) => ({
+						...prevResults,
+						[key]: cached.data,
+					}));
+					return prev;
+				}
+
+				return [...prev, { symbol, interval, startDate, endDate }];
+			});
 		},
-		[queue]
+		[]
 	);
 
 	useEffect(() => {
-		const minuteReset = setInterval(() => {
+		const minuteTimer = setInterval(() => {
 			apiCallsInCurrentMinute = 0;
 		}, 60000);
 
-		const dailyReset = setInterval(() => {
+		const dailyTimer = setInterval(() => {
 			apiCallsToday = 0;
 		}, 86400000);
 
 		return () => {
-			clearInterval(minuteReset);
-			clearInterval(dailyReset);
+			clearInterval(minuteTimer);
+			clearInterval(dailyTimer);
 		};
 	}, []);
 
-	const getResult = (
-		symbol,
-		interval = "1d",
-		range = "1mo",
-		startDate,
-		endDate
-	) => {
-		const key = makeCacheKey(symbol, interval, range, startDate, endDate);
-		const cached = stockDataCache[key];
-		if (!cached) return null;
-		if (Date.now() - cached.timestamp > CACHE_TTL) return null;
-		return cached.data;
-	};
-
-	return { addToQueue, results, isFetching, getResult };
+	return { addToQueue, results, isFetching };
 };
 
 export default useRateLimitedFetch;

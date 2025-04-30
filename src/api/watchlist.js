@@ -1,6 +1,5 @@
 import axios from "./axiosInstance.js";
 
-
 export const getWatchlistsByUser = async () => {
 	try {
 		// Get the token from localStorage using the correct key
@@ -12,6 +11,7 @@ export const getWatchlistsByUser = async () => {
 			throw new Error("User not authenticated.");
 		}
 
+		// Make the API call to fetch watchlists
 		const response = await axios.get("/watchlist", {
 			headers: {
 				Authorization: `Bearer ${token}`,
@@ -19,13 +19,13 @@ export const getWatchlistsByUser = async () => {
 		});
 		return response.data;
 	} catch (error) {
-		console.error("Error Response:", error.response?.data || error.message);
+		
 		throw new Error(
-			error.message ||
-				"Something went wrong with the server."
+			error.message || "Something went wrong with the server."
 		);
 	}
 };
+
 
 export const getASingleWatchlist = async (watchlistId) => {
 	if (!watchlistId) {

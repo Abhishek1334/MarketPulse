@@ -52,8 +52,7 @@ const CreateWatchlist = ({ onClose }) => {
 
 		try {
 			const response = await validateStockSymbol(lastStock.symbol.trim());
-			console.log("Validation Response:", response); // Log the response for debugging
-
+			
 			// Check if the message contains 'valid'
 			if (
 				response?.message?.includes("is valid") &&
@@ -79,11 +78,10 @@ const CreateWatchlist = ({ onClose }) => {
 					}
 				}, 50);
 			} else {
-				console.log("Invalid stock symbol:", lastStock.symbol); // Log for debugging
+				
 				throw new Error("Invalid stock symbol.");
 			}
 		} catch (error) {
-			console.log("Validation failed:", error); // Log for debugging
 			showError(error.message || "Invalid stock symbol.");
 		}
 		setValidating(false);
