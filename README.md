@@ -1,5 +1,7 @@
 # Market Pulse 📈
 
+LIVE SITE: https://market-pulse-two.vercel.app/
+
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![Zustand](https://img.shields.io/badge/Zustand-007acc?style=for-the-badge&logo=zustand&logoColor=white)
@@ -44,7 +46,7 @@
 | **Charting**     | Chart.js                                                       |
 | **APIs**         | Yahoo Finance API, Twelve Data   |
 | **Backend**      | Node.js, Express.js, JWT (Authentication)                     |
-| **Deployment**   | Vercel (Frontend), Render (Backend)                   |
+| **Deployment**   | Vercel (Frontend), Railway (Backend)                   |
 
 ---
 
