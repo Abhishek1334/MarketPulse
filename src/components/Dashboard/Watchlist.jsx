@@ -15,6 +15,8 @@ const Watchlist = ({ loading }) => {
 		);
 	}
 
+	
+
 	return (
 		<div className="mt-4  p-10 bg-[var(--background-100)] shadow-md rounded-lg relative transition-all duration-500 ease-in-out max-md:p-3">
 			{loading ? (
