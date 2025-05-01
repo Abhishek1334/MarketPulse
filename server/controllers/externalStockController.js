@@ -94,10 +94,13 @@ export const getStockDataforWatchlist = async (req, res, next) => {
 		next(createError("Failed to fetch stock data", 500));
 	}
 };
+
+
 export const getStockChartData = async (req, res, next) => {
 	try {
 		const { symbol, interval = "1d", startDate, endDate } = req.query;
 
+		
 		// Validate required parameters
 		if (!symbol || !startDate || !endDate) {
 			throw createError(
@@ -105,9 +108,14 @@ export const getStockChartData = async (req, res, next) => {
 				"Symbol, startDate, and endDate are required"
 			);
 		}
+		const cleanedSymbol = symbol.trim().toUpperCase();
+		if (!/^[A-Z]{1,5}$/.test(cleanedSymbol)) {
+			throw createError(400, "Invalid stock symbol format");
+		}
+
 
 		// Validate stock symbol format
-		if (!/^[A-Za-z]{1,5}$/.test(symbol)) {
+		if (!/^[A-Za-z]{1,5}$/.test(cleanedSymbol)) {
 			throw createError(400, "Invalid stock symbol format");
 		}
 
@@ -130,13 +138,14 @@ export const getStockChartData = async (req, res, next) => {
 		const period2 = Math.floor(end.getTime() / 1000);
 		
 		// Fetch data from Yahoo Finance
-		const chartData = await yahooFinance.chart(symbol, {
+		const chartData = await yahooFinance.chart(cleanedSymbol, {
 			period1,
 			period2,
 			interval,
 			includePrePost: false,
 		});
-	// Validate response structure
+		console.log(chartData)
+		// Validate response structure
 		if (!chartData?.quotes || !Array.isArray(chartData.quotes)) {
 			throw createError(502, "Invalid data format from financial API");
 		}
@@ -177,13 +186,12 @@ export const getStockChartData = async (req, res, next) => {
 
 		// Build metadata
 		const meta = {
-			symbol: chartData.meta?.symbol || symbol.toUpperCase(),
+			symbol: chartData.meta?.symbol || cleanedSymbol.toUpperCase(),
 			exchange: chartData.meta?.fullExchangeName || "Unknown Exchange",
 			currency: chartData.meta?.currency || "USD",
 			timezone: chartData.meta?.exchangeTimezoneName || "UTC",
 			dataGranularity: chartData.meta?.dataGranularity || interval,
 		};
-
 		res.status(200).json({
 			success: true,
 			meta,
@@ -194,14 +202,17 @@ export const getStockChartData = async (req, res, next) => {
 					: undefined,
 		});
 	} catch (error) {
-		console.error(`Chart data error for ${symbol}:`, error);
-		next(
-			createError(
-				error.status || 500,
-				error.message || "Failed to fetch chart data"
-			)
-		);
-	}
+	console.error(
+		`Chart data error for ${req?.query?.symbol || "unknown symbol"}:`,
+		error
+	);
+	next(
+		createError(
+			error.status || 500,
+			error.message || "Failed to fetch chart data"
+		)
+	);
+}
 };
 
 

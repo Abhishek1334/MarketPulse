@@ -24,6 +24,120 @@ const useRateLimitedFetch = () => {
 	const isMountedRef = useRef(true);
 	const queueRef = useRef(queue);
 
+	
+
+	
+	
+
+	const fetchData = useCallback(
+		async (symbol, interval = "1d", startDate, endDate) => {
+			const key = makeCacheKey(symbol, interval, startDate, endDate);
+			const cached = stockDataCache[key];
+			const now = Date.now();
+
+			if (cached && now - cached.timestamp < CACHE_TTL) {
+				console.log(`Cache hit for ${key}:`, cached.data);
+				return { success: true, data: cached.data };
+			}
+
+			if (apiCallsInCurrentMinute >= MAX_REQUESTS_PER_MINUTE) {
+				console.log("Rate limit exceeded (minute)");
+				return {
+					success: false,
+					error: "Rate limit exceeded (minute)",
+				};
+			}
+			if (apiCallsToday >= MAX_REQUESTS_PER_DAY) {
+				console.log("Rate limit exceeded (day)");
+				return { success: false, error: "Rate limit exceeded (day)" };
+			}
+
+			try {
+				const response = await getTimeSeriesStockDatafromExternalAPI(
+					symbol,
+					interval,
+					startDate,
+					endDate
+				);
+				console.log("API Response from external service:", response);
+				console.log("typeof response:", typeof response);
+				console.log("Is array:", Array.isArray(response));
+				console.log("Length:", response?.length);
+				if (response && !response.status?.includes("error")) {
+					stockDataCache[key] = { data: response, timestamp: now };
+					apiCallsInCurrentMinute++;
+					apiCallsToday++;
+					return { success: true, data: response };
+				}
+
+				console.log("Failed to fetch data:", response);
+				return { success: false, error: "Failed to fetch data" };
+			} catch (error) {
+				console.error("Fetch error:", error);
+				return { success: false, error: error.message };
+			}
+		},
+		[]
+	);
+const processQueue = useCallback(async () => {
+	if (!isFetching && queueRef.current.length > 0 && isMountedRef.current) {
+		setIsFetching(true);
+		const [nextRequest] = queueRef.current;
+
+		try {
+			const result = await fetchData(
+				nextRequest.symbol,
+				nextRequest.interval,
+				nextRequest.startDate,
+				nextRequest.endDate
+			);
+
+			console.log(
+				`Processing request for ${nextRequest.symbol} - Result:`,
+				result
+			);
+
+			if (isMountedRef.current) {
+				const key = makeCacheKey(
+					nextRequest.symbol,
+					nextRequest.interval,
+					nextRequest.startDate,
+					nextRequest.endDate
+				);
+
+				// Update both cache and results state
+				setResults((prev) => {
+					console.log("Setting results:", {
+						...prev,
+						[key]: result.success
+							? result.data
+							: { error: result.error },
+					});
+					return {
+						...prev,
+						[key]: result.success
+							? result.data
+							: { error: result.error },
+					};
+				});
+				setQueue((prev) => prev.slice(1));
+			}
+		} finally {
+			if (isMountedRef.current) {
+				setIsFetching(false);
+			}
+		}
+	}
+}, [fetchData, isFetching]);
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			processQueue();
+		}, 500); // Try to process queue every 500ms
+
+		return () => clearInterval(interval);
+	}, [processQueue]);
+
 	useEffect(() => {
 		queueRef.current = queue;
 	}, [queue]);
@@ -35,101 +149,11 @@ const useRateLimitedFetch = () => {
 		};
 	}, []);
 
-	const fetchData = useCallback(
-		async (symbol, interval = "1d", startDate, endDate) => {
-			const key = makeCacheKey(symbol, interval, startDate, endDate);
-			const cached = stockDataCache[key];
-			const now = Date.now();
-
-			if (cached && now - cached.timestamp < CACHE_TTL) {
-				return { success: true, data: cached.data };
-			}
-
-			if (apiCallsInCurrentMinute >= MAX_REQUESTS_PER_MINUTE) {
-				return {
-					success: false,
-					error: "Rate limit exceeded (minute)",
-				};
-			}
-			if (apiCallsToday >= MAX_REQUESTS_PER_DAY) {
-				return { success: false, error: "Rate limit exceeded (day)" };
-			}
-
-			try {
-				const response = await getTimeSeriesStockDatafromExternalAPI(
-					symbol,
-					interval,
-					startDate,
-					endDate
-				);
-
-				if (response && !response.status?.includes("error")) {
-					stockDataCache[key] = { data: response, timestamp: now };
-					apiCallsInCurrentMinute++;
-					apiCallsToday++;
-					return { success: true, data: response };
-				}
-
-				return { success: false, error: "Failed to fetch data" };
-			} catch (error) {
-				console.error("Fetch error:", error);
-				return { success: false, error: error.message };
-			}
-		},
-		[]
-	);
-
-	const processQueue = useCallback(async () => {
-		if (
-			!isFetching &&
-			queueRef.current.length > 0 &&
-			isMountedRef.current
-		) {
-			setIsFetching(true);
-			const [nextRequest] = queueRef.current;
-
-			try {
-				const result = await fetchData(
-					nextRequest.symbol,
-					nextRequest.interval,
-					nextRequest.startDate,
-					nextRequest.endDate
-				);
-
-				if (isMountedRef.current) {
-					const key = makeCacheKey(
-						nextRequest.symbol,
-						nextRequest.interval,
-						nextRequest.startDate,
-						nextRequest.endDate
-					);
-
-					// Update both cache and results state
-					setResults((prev) => ({
-						...prev,
-						[key]: result.success
-							? result.data
-							: { error: result.error },
-					}));
-
-					setQueue((prev) => prev.slice(1));
-				}
-			} finally {
-				if (isMountedRef.current) {
-					setIsFetching(false);
-				}
-			}
-		}
-	}, [fetchData, isFetching]);
-
-	useEffect(() => {
-		const interval = setInterval(processQueue, 100);
-		return () => clearInterval(interval);
-	}, [processQueue]);
-
 	const addToQueue = useCallback(
 		(symbol, interval = "1d", startDate, endDate) => {
 			const key = makeCacheKey(symbol, interval, startDate, endDate);
+
+			console.log(`Adding to queue: ${key}`);
 
 			setQueue((prev) => {
 				const existsInQueue = prev.some(
@@ -150,6 +174,7 @@ const useRateLimitedFetch = () => {
 						...prevResults,
 						[key]: cached.data,
 					}));
+					console.log("Cache hit. Returning data:", cached.data);
 					return prev;
 				}
 
