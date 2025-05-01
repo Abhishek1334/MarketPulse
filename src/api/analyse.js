@@ -87,10 +87,13 @@ export const getTimeSeriesStockDatafromExternalAPI = async (
 	if (!symbol) {
 		throw new Error("Symbol is required.");
 	}
+	const formatDate = (date) => date.toISOString().split("T")[0]; 
+
+	console.log(`symbol: ${symbol}, interval: ${interval}, startDate: ${startDate}, endDate: ${endDate}`);
 
 	try {
 		const response = await axios.get(
-			`/stock/chart?symbol=${symbol}&interval=${interval}&startDate=${startDate}&endDate=${endDate}`,
+			`/stock/chart?symbol=${symbol}&interval=${interval}&startDate=${formatDate(startDate)}&endDate=${formatDate(endDate)}`,
 			{
 				headers: {
 					Authorization: `Bearer ${token}`,

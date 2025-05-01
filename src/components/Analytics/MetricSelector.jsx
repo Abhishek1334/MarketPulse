@@ -1,19 +1,48 @@
-import React from 'react'
+import { useAnalyticsStore } from "@/context/AnalyticsStore";
+import {
+	BarChart2,
+	TrendingUp,
+	ArrowUp,
+	ArrowDown,
+	Activity,
+} from "lucide-react";
 
-const MetricSelector = ({ selectedMetric, handleMetricChange, metrics }) => {
-	return (
-		<select
-			value={selectedMetric}
-			onChange={(e) => handleMetricChange(e.target.value)}
-			className="px-4 py-2 border border-gray-200 rounded-lg bg-[var(--background-50)] text-[var(--text-950)] focus:outline-none focus:ring-1 focus:ring-indigo-500"
-		>
-			{metrics.map((metric) => (
-				<option key={metric} value={metric}>
-					{metric.toUpperCase()}
-				</option>
-			))}
-		</select>
+const metrics = [
+	{ id: "close", label: "Close", icon: TrendingUp },
+	{ id: "open", label: "Open", icon: Activity },
+	{ id: "high", label: "High", icon: ArrowUp },
+	{ id: "low", label: "Low", icon: ArrowDown },
+	{ id: "volume", label: "Volume", icon: BarChart2 },
+];
+
+const MetricSelector = () => {
+	const selectedMetric = useAnalyticsStore((state) => state.selectedMetric);
+	const setSelectedMetric = useAnalyticsStore(
+		(state) => state.setSelectedMetric
 	);
-}
 
-export default MetricSelector
+	return (
+		<div className="flex items-center gap-2">
+			{metrics.map(({ id, label, icon: Icon }) => (
+				<button
+					key={id}
+					onClick={() => setSelectedMetric(id)}
+					className={`
+            flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm
+            transition-all duration-200 
+            ${
+				selectedMetric === id
+					? "bg-purple-600 text-white shadow-sm hover:bg-purple-700"
+					: "bg-gray-50 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+			}
+          `}
+				>
+					<Icon className="h-4 w-4" />
+					<span>{label}</span>
+				</button>
+			))}
+		</div>
+	);
+};
+
+export default MetricSelector;
