@@ -63,8 +63,8 @@ const AnalyticsPage = () => {
 	return (
 		<div className="flex flex-col items-center justify-center h-[90vh]">
 			{/* Show under construction message */}
-			<h1 className="text-3xl font-bold ">Under Construction</h1>
-			<p className="text-lg font-medium">This page is currently under construction.</p>
+			<h1 className="text-3xl font-bold ">Under Maintainence</h1>
+			<p className="text-lg font-medium">This page is being rebuilt due to recent changes in yahoo finance api.</p>
 			<button onClick={() => navigate(-1)} className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md px-6 py-3 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">Go Back</button>
 		</div>
 		// <div className="analytics-container">
