@@ -61,57 +61,52 @@ const AnalyticsPage = () => {
 	);
 
 	return (
-		<div className="flex flex-col items-center justify-center h-[90vh]">
-			{/* Show under construction message */}
-			<h1 className="text-3xl font-bold ">Under Maintainence</h1>
-			<p className="text-lg font-medium">This page is being rebuilt due to recent changes in yahoo finance api.</p>
-			<button onClick={() => navigate(-1)} className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md px-6 py-3 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">Go Back</button>
+		
+		<div className="analytics-container">
+			<header className="analytics-header">
+				<h1>{symbol} Analytics</h1>
+				<div className="price-display">
+					<span className="price">{latestPrice}</span>
+				</div>
+			</header>
+
+			<main className="analytics-content">
+				<div className="chart-container">
+					<div className="chart-placeholder">
+						{/* Empty space for future chart implementation */}
+					</div>
+				</div>
+
+				<div className="info-cards">
+					<div className="info-card">
+						<h3>Latest Session</h3>
+						{processedData[0] ? (
+							<ul>
+								<li>
+									Open: ${processedData[0].open.toFixed(2)}
+								</li>
+								<li>
+									High: ${processedData[0].high.toFixed(2)}
+								</li>
+								<li>Low: ${processedData[0].low.toFixed(2)}</li>
+								<li>
+									Volume:{" "}
+									{processedData[0].volume.toLocaleString()}
+								</li>
+							</ul>
+						) : (
+							<p>No data available</p>
+						)}
+					</div>
+
+					<div className="info-card">
+						<h3>Market Status</h3>
+						<p className="market-open">Market is Open</p>
+						<p>Hours: 9:30 AM - 4:00 PM EST</p>
+					</div>
+				</div>
+			</main>
 		</div>
-		// <div className="analytics-container">
-		// 	<header className="analytics-header">
-		// 		<h1>{symbol} Analytics</h1>
-		// 		<div className="price-display">
-		// 			<span className="price">{latestPrice}</span>
-		// 		</div>
-		// 	</header>
-
-		// 	<main className="analytics-content">
-		// 		<div className="chart-container">
-		// 			<div className="chart-placeholder">
-		// 				{/* Empty space for future chart implementation */}
-		// 			</div>
-		// 		</div>
-
-		// 		<div className="info-cards">
-		// 			<div className="info-card">
-		// 				<h3>Latest Session</h3>
-		// 				{processedData[0] ? (
-		// 					<ul>
-		// 						<li>
-		// 							Open: ${processedData[0].open.toFixed(2)}
-		// 						</li>
-		// 						<li>
-		// 							High: ${processedData[0].high.toFixed(2)}
-		// 						</li>
-		// 						<li>Low: ${processedData[0].low.toFixed(2)}</li>
-		// 						<li>
-		// 							Volume:{" "}
-		// 							{processedData[0].volume.toLocaleString()}
-		// 						</li>
-		// 					</ul>
-		// 				) : (
-		// 					<p>No data available</p>
-		// 				)}
-		// 			</div>
-
-		// 			<div className="info-card">
-		// 				<h3>Market Status</h3>
-		// 				<p className="market-open">Market is Open</p>
-		// 				<p>Hours: 9:30 AM - 4:00 PM EST</p>
-		// 			</div>
-		// 		</div>
-		// 	</main>
-		// </div>
 	);
 };
 
