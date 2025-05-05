@@ -26,14 +26,14 @@ LIVE SITE: https://market-pulse-two.vercel.app/
 ## 🚀 Features
 
 - 📊 Real-time Stock Charting
-- 📅 Customizable Timeframe Filters (1D, 1W, 1M, 3M, 1Y, ALL)
+- 📅 Customizable Timeframe Filters (1D, 1M, 1Y, ALL)
 - 🔄 Toggle Metrics: Open, Close, High, Low, Volume
 - 🧩 Modular & Scalable Component Architecture
 - 🧠 Global State Management with Zustand
 - 🧹 Optimized Data Fetching & Rate-Limiting
 - 🗓️ Start/End Date Range Selector
 - 🎨 Responsive, Mobile-Friendly Design
-- 🌗 (Optional) Light/Dark Mode
+- 🌗 Light/Dark Mode
 
 ---
 
@@ -67,9 +67,9 @@ The app is deployed on **Vercel** for seamless performance.
     <td><b>Signup Page</b></td>
   </tr>
   <tr>
-    <td><img src="./public/screenshots/Homepage.png" alt="Homepage" width="300"/></td>
-    <td><img src="./public/screenshots/loginPage.png" alt="Login" width="300"/></td>
-    <td><img src="./public/screenshots/signupPage.png" alt="Signup" width="300"/></td>
+    <td><img src="./public/screenshots/Homepage.png" alt="Homepage" width="500"/></td>
+    <td><img src="./public/screenshots/loginPage.png" alt="Login" width="500"/></td>
+    <td><img src="./public/screenshots/signupPage.png" alt="Signup" width="500"/></td>
   </tr>
 
   <tr>
@@ -78,9 +78,9 @@ The app is deployed on **Vercel** for seamless performance.
     <td><b>Analytics Page (Light Mode)</b></td>
   </tr>
   <tr>
-    <td><img src="./public/screenshots/DashboardLight.png" alt="Dashboard Light Mode" width="300"/></td>
-    <td><img src="./public/screenshots/DashboardDark.png" alt="Dashboard Dark Mode" width="300"/></td>
-    <td><img src="./public/screenshots/AnalyticsPageLight.png" alt="Analytics Page Light Mode" width="300"/></td>
+    <td><img src="./public/screenshots/DashboardLight.png" alt="Dashboard Light Mode" width="500"/></td>
+    <td><img src="./public/screenshots/DashboardDark.png" alt="Dashboard Dark Mode" width="500"/></td>
+    <td><img src="./public/screenshots/AnalyticsPageLight.png" alt="Analytics Page Light Mode" width="500"/></td>
   </tr>
 
   <tr>
@@ -89,9 +89,9 @@ The app is deployed on **Vercel** for seamless performance.
     <td><b>Watchlist Page (Dark Mode)</b></td>
   </tr>
   <tr>
-    <td><img src="./public/screenshots/AnalyticsPageDark.png" alt="Analytics Page Dark Mode" width="300"/></td>
-    <td><img src="./public/screenshots/WatchlistPageLight.png" alt="Watchlist Page Light Mode" width="300"/></td>
-    <td><img src="./public/screenshots/WatchlistPageDark.png" alt="Watchlist Page Dark Mode" width="300"/></td>
+    <td><img src="./public/screenshots/AnalyticsPageDark.png" alt="Analytics Page Dark Mode" width="500"/></td>
+    <td><img src="./public/screenshots/WatchlistPageLight.png" alt="Watchlist Page Light Mode" width="500"/></td>
+    <td><img src="./public/screenshots/WatchlistPageDark.png" alt="Watchlist Page Dark Mode" width="500"/></td>
   </tr>
 </table>
 
