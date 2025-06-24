@@ -29,7 +29,7 @@ const MetricSelector = () => {
 					onClick={() => setSelectedMetric(id)}
 					className={`
             flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm
-            transition-all duration-200 
+            transition-all duration-200 max-sm:px-2
             ${
 				selectedMetric === id
 					? "bg-purple-600 text-white shadow-sm hover:bg-purple-700"
@@ -37,7 +37,7 @@ const MetricSelector = () => {
 			}
           `}
 				>
-					<Icon className="h-4 w-4" />
+					<Icon className="h-4 w-4 max-sm:hidden" />
 					<span>{label}</span>
 				</button>
 			))}
