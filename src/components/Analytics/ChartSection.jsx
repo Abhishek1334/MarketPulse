@@ -133,7 +133,7 @@ const ChartSection = () => {
 	return (
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
-				<h2 className="text-lg font-semibold text-[var(--text-950)]">
+				<h2 className="text-lg font-semibold text-[var(--text-950)] max-sm:hidden">
 					Price Chart
 				</h2>
 				<MetricSelector />
