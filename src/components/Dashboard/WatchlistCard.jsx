@@ -1,13 +1,16 @@
 import { FaListAlt } from "react-icons/fa";
-import { Eye, Pencil, Trash2, Save, XSquare } from "lucide-react";
+import { Eye, Pencil, Trash2, Save, XSquare, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import TooltipIconButton from "../TooltipIconButton";
 import { updateWatchlistName } from "../../api/watchlist";
-import { showSuccess, showError } from "../../utils/toast";
+import { showSuccess, showError } from "../../utils/toast.jsx";
 import { DeleteAWatchlist } from "../../api/watchlist";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 
 const WatchlistCard = ({ watchlist }) => {
 	const [isEditing, setIsEditing] = useState(false);
@@ -122,9 +125,8 @@ const WatchlistCard = ({ watchlist }) => {
 	const stocks = Array.isArray(watchlist.stocks) ? watchlist.stocks : [];
 
 	return (
-		<div className="bg-[var(--background-50)] text-[var(--text-950)] p-5 rounded-xl shadow-sm hover:shadow-md border border-[var(--background-200)] transition-all duration-500 ease-in-out
-		max-md:p-3 ">
-			<h3 className="font-semibold text-lg flex items-center gap-3 mb-1 max-md:font-semibold max-md:text-base">
+		<Card className="bg-[var(--background-100)]/80 dark:bg-[var(--background-200)]/80 backdrop-blur-sm border-[var(--background-200)] dark:border-[var(--background-300)] shadow-lg hover:shadow-xl transition-all duration-200">
+			<CardContent className="p-5 max-md:p-3">
 				{isModalOpen && (
 					<ConfirmationModal
 						open={isModalOpen}
@@ -134,77 +136,95 @@ const WatchlistCard = ({ watchlist }) => {
 						watchlist={true}
 					/>
 				)}
-				<FaListAlt className="text-[var(--primary-500)] size-6" />
-				{isEditing ? (
-					<form
-						onSubmit={handleEditing}
-						className="flex items-center gap-2 h-full "
-					>
-						<input
-							type="text"
-							value={watchlistName}
-							onChange={handleChange}
-							className="bg-[var(--background-100)] text-[var(--text-950)] p-2 rounded-md w-[70%] overflow-auto"
-							required
-							onKeyDown={(e) =>
-								e.key === "Enter" && handleEditing(e)
-							}
-						/>
-						<button
-							type="submit"
-							className="bg-[var(--primary-500)] text-white rounded-md hover:bg-[var(--primary-600)] p-2"
-							disabled={
-								watchlistName.trim() === watchlist.name ||
-								isUpdating
-							}
-						>
-							<Save className="size-6" />
-						</button>
-						<button
-							type="button" // Prevent form submission on Cancel
-							className="bg-red-500 text-white rounded-md hover:bg-[var(--primary-600)] p-2"
-							onClick={handleCancelUpdate} // Handle cancel here
-						>
-							<XSquare className="size-6" />
-						</button>
-					</form>
-				) : (
-					<div
-						className="cursor-pointer truncate"
-						onClick={() => navigate(`/watchlist/${watchlist._id}`)}
-					>
-						{watchlist.name}
+				
+				<div className="flex items-center gap-3 mb-3">
+					<div className="w-10 h-10 bg-gradient-to-br from-[var(--primary-500)] to-[var(--accent-500)] rounded-lg flex items-center justify-center">
+						<FaListAlt className="text-white text-lg" />
 					</div>
-				)}
-			</h3>
+					
+					{isEditing ? (
+						<form
+							onSubmit={handleEditing}
+							className="flex items-center gap-2 flex-1"
+						>
+							<Input
+								type="text"
+								value={watchlistName}
+								onChange={handleChange}
+								className="flex-1 bg-[var(--background-50)] dark:bg-[var(--background-100)] border-[var(--background-300)] dark:border-[var(--background-400)] text-[var(--text-900)] dark:text-[var(--text-50)] focus:border-[var(--primary-500)] dark:focus:border-[var(--primary-400)] focus:ring-[var(--primary-500)] dark:focus:ring-[var(--primary-400)]"
+								required
+								autoFocus
+								onKeyDown={(e) =>
+									e.key === "Enter" && handleEditing(e)
+								}
+							/>
+							<Button
+								type="submit"
+								size="sm"
+								disabled={
+									watchlistName.trim() === watchlist.name ||
+									isUpdating
+								}
+								className="bg-[var(--primary-500)] hover:bg-[var(--primary-600)] text-white"
+							>
+								{isUpdating ? (
+									<Loader2 className="w-4 h-4 animate-spin" />
+								) : (
+									<Save className="w-4 h-4" />
+								)}
+							</Button>
+							<Button
+								type="button"
+								size="sm"
+								variant="outline"
+								onClick={handleCancelUpdate}
+								className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20"
+							>
+								<XSquare className="w-4 h-4" />
+							</Button>
+						</form>
+					) : (
+						<div
+							className="cursor-pointer truncate flex-1"
+							onClick={() => navigate(`/watchlist/${watchlist._id}`)}
+						>
+							<h3 className="font-semibold text-lg max-md:text-base text-[var(--text-900)] dark:text-[var(--text-50)] hover:text-[var(--primary-600)] dark:hover:text-[var(--primary-400)] transition-colors">
+								{watchlist.name}
+							</h3>
+						</div>
+					)}
+				</div>
 
-			<p className="text-md font-medium text-[var(--text-900)] mb-3 ">
-				Stocks Tracked:{" "}
-				<span className="font-medium">{stocks.length}</span>
-			</p>
+				<p className="text-md font-medium text-[var(--text-700)] dark:text-[var(--text-300)] mb-4">
+					Stocks Tracked:{" "}
+					<span className="font-semibold text-[var(--primary-600)] dark:text-[var(--primary-400)]">
+						{stocks.length}
+					</span>
+				</p>
 
-			<div className="flex flex-wrap gap-3 justify-start mt-auto">
-				<TooltipIconButton
-					icon={Eye}
-					label="View Watchlist"
-					variant="view"
-					onClick={() => navigate(`/watchlist/${watchlist._id}`)}
-				/>
-				<TooltipIconButton
-					icon={Pencil}
-					label="Edit Watchlist"
-					variant="edit"
-					onClick={toggleEditing}
-				/>
-				<TooltipIconButton
-					icon={Trash2}
-					label="Delete Watchlist"
-					variant="delete"
-					className="bg-red-500 hover:bg-red-600 text-white"
-					onClick={handleDelete}
-				/>
-			</div>
-		</div>
+				<div className="flex flex-wrap gap-3 justify-start">
+					<TooltipIconButton
+						icon={Eye}
+						label="View Watchlist"
+						variant="view"
+						onClick={() => navigate(`/watchlist/${watchlist._id}`)}
+					/>
+					<TooltipIconButton
+						icon={Pencil}
+						label="Edit Watchlist"
+						variant="edit"
+						onClick={toggleEditing}
+					/>
+					<TooltipIconButton
+						icon={Trash2}
+						label="Delete Watchlist"
+						variant="delete"
+						className="bg-red-500 hover:bg-red-600 text-white"
+						onClick={handleDelete}
+					/>
+				</div>
+			</CardContent>
+		</Card>
 	);
 };
 

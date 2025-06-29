@@ -1,21 +1,25 @@
-import { useState } from "react";
-import { XCircleIcon } from "lucide-react";
-import { showSuccess, showError } from "@/utils/toast";
+import { useState, useEffect, useRef } from "react";
+import { X, Plus, Trash2, Loader2, FolderPlus, TrendingUp, DollarSign, FileText, CheckCircle, AlertCircle } from "lucide-react";
+import { showSuccess, showError } from "@/utils/toast.jsx";
 import useStore from "@/context/Store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CreateAWatchlist } from "@/api/watchlist";
 import { validateStockSymbol } from "@/api/stock";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const CreateWatchlist = ({ onClose }) => {
 	const [name, setName] = useState("");
 	const [stocks, setStocks] = useState([
-		{ symbol: "", note: "", targetPrice: "", valid: false },
+		{ symbol: "", note: "", targetPrice: "", valid: false, validating: false, error: "" },
 	]);
 	const [validating, setValidating] = useState(false);
 	const queryClient = useQueryClient();
-	const { addWatchlist } = useStore(); 
+	const { addWatchlist } = useStore();
+	const validationTimeouts = useRef({});
 
-	
 	const { mutate, isLoading, isError, error } = useMutation({
 		mutationFn: async ({ name, stocks }) => {
 			const response = await CreateAWatchlist(name, stocks);
@@ -34,11 +38,66 @@ const CreateWatchlist = ({ onClose }) => {
 					error?.message ||
 					"Something went wrong."
 			);
-
 		},
 	});
 
+	// Auto-validate stock symbol with delay
+	const validateStockWithDelay = async (index, symbol) => {
+		// Clear existing timeout for this index
+		if (validationTimeouts.current[index]) {
+			clearTimeout(validationTimeouts.current[index]);
+		}
 
+		// Set validating state
+		setStocks(prev => {
+			const updated = [...prev];
+			updated[index] = { ...updated[index], validating: true, error: "" };
+			return updated;
+		});
+
+		// Set timeout for validation
+		validationTimeouts.current[index] = setTimeout(async () => {
+			if (!symbol.trim()) {
+				setStocks(prev => {
+					const updated = [...prev];
+					updated[index] = { ...updated[index], validating: false, valid: false, error: "" };
+					return updated;
+				});
+				return;
+			}
+
+			try {
+				const response = await validateStockSymbol(symbol.trim());
+				
+				if (response?.message?.includes("is valid") && response?.data?.symbol) {
+					setStocks(prev => {
+						const updated = [...prev];
+						updated[index] = {
+							...updated[index],
+							symbol: response.data.symbol.toUpperCase(),
+							valid: true,
+							validating: false,
+							error: ""
+						};
+						return updated;
+					});
+				} else {
+					throw new Error("Invalid stock symbol");
+				}
+			} catch (error) {
+				setStocks(prev => {
+					const updated = [...prev];
+					updated[index] = {
+						...updated[index],
+						valid: false,
+						validating: false,
+						error: error.message || "Invalid stock symbol"
+					};
+					return updated;
+				});
+			}
+		}, 1000); // 1 second delay
+	};
 
 	const addStock = async () => {
 		const lastStock = stocks[stocks.length - 1];
@@ -48,59 +107,46 @@ const CreateWatchlist = ({ onClose }) => {
 			return;
 		}
 
-		setValidating(true);
-
-		try {
-			const response = await validateStockSymbol(lastStock.symbol.trim());
-			
-			// Check if the message contains 'valid'
-			if (
-				response?.message?.includes("is valid") &&
-				response?.data?.symbol
-			) {
-				const updated = [...stocks];
-				updated[stocks.length - 1].valid = true;
-				updated[stocks.length - 1].symbol =
-					response.data.symbol.toUpperCase(); // Normalize
-
-				setStocks([
-					...updated,
-					{ symbol: "", note: "", targetPrice: "", valid: false },
-				]);
-
-				// Focus on next symbol input
-				setTimeout(() => {
-					const inputs = document.querySelectorAll(
-						"input[placeholder^='Symbol']"
-					);
-					if (inputs.length > 0) {
-						inputs[inputs.length - 1].focus();
-					}
-				}, 50);
-			} else {
-				
-				throw new Error("Invalid stock symbol.");
-			}
-		} catch (error) {
-			showError(error.message || "Invalid stock symbol.");
+		if (!lastStock.valid) {
+			showError("Please wait for stock validation to complete.");
+			return;
 		}
-		setValidating(false);
+
+		setStocks([
+			...stocks,
+			{ symbol: "", note: "", targetPrice: "", valid: false, validating: false, error: "" },
+		]);
+
+		setTimeout(() => {
+			const inputs = document.querySelectorAll(
+				"input[placeholder*='Symbol']"
+			);
+			if (inputs.length > 0) {
+				inputs[inputs.length - 1].focus();
+			}
+		}, 50);
 	};
-
-
 
 	const handleStockChange = (index, field, value) => {
 		const updated = [...stocks];
 		updated[index][field] = value;
 
 		if (field === "symbol") {
-			updated[index].valid = false; // Reset validity on symbol change
+			updated[index].valid = false;
+			updated[index].error = "";
+			// Trigger auto-validation
+			validateStockWithDelay(index, value);
 		}
 
 		setStocks(updated);
 	};
 
 	const removeStock = (index) => {
+		// Clear timeout for this index
+		if (validationTimeouts.current[index]) {
+			clearTimeout(validationTimeouts.current[index]);
+			delete validationTimeouts.current[index];
+		}
 		setStocks(stocks.filter((_, i) => i !== index));
 	};
 
@@ -123,7 +169,7 @@ const CreateWatchlist = ({ onClose }) => {
 			}
 
 			if (!stock.valid) {
-				showError(`Stock ${stock.symbol} is invalid.`);
+				showError(`Stock ${stock.symbol} is invalid or still validating.`);
 				return;
 			}
 		}
@@ -137,147 +183,286 @@ const CreateWatchlist = ({ onClose }) => {
 	};
 
 	const resetForm = () => {
+		// Clear all timeouts
+		Object.values(validationTimeouts.current).forEach(timeout => {
+			clearTimeout(timeout);
+		});
+		validationTimeouts.current = {};
+		
 		setName("");
-		setStocks([{ symbol: "", note: "", targetPrice: "", valid: false }]);
+		setStocks([{ symbol: "", note: "", targetPrice: "", valid: false, validating: false, error: "" }]);
 	};
 
+	// Cleanup timeouts on unmount
+	useEffect(() => {
+		return () => {
+			Object.values(validationTimeouts.current).forEach(timeout => {
+				clearTimeout(timeout);
+			});
+		};
+	}, []);
+
 	return (
-		<form
-			onSubmit={handleSubmit}
-			className="bg-[var(--secondary-50)] shadow-2xl rounded-2xl p-5 flex flex-col gap-3 w-[50%]  absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[var(--text-950)] border border-[var(--background-600)] z-50
-			max-md:p-4 max-md:w-[60%] max-sm:w-[80%]" 
-		>
-			<div className="flex justify-between gap-3">
-				<h2 className="text-lg font-bold ">
-					Create New Watchlist
-				</h2>
-				<XCircleIcon
-					className="top-2 right-2 cursor-pointer mt-1 mr-2"
-					onClick={() => {
-						resetForm();
-						onClose();
-					}}
-				/>
-			</div>
-
-			<div className="flex flex-col gap-2">
-				<label className="text-md font-bold">Watchlist Name</label>
-				<input
-					type="text"
-					value={name}
-					onChange={(e) => setName(e.target.value)}
-					placeholder="Enter watchlist name"
-					className="inputField"
-					required
-				/>
-			</div>
-
-			<div className="flex flex-col  gap-2">
-				<label className="text-md font-bold">Stocks (Optional)</label>
-				{stocks.map((stock, index) => (
-					<div
-						key={index}
-						className="flex flex-col  gap-3 bg-[var(--accent-100)] p-4 rounded-xl shadow-md"
-					>
-						<div className="flex gap-2 flex-wrap">
-							<input
-								type="text"
-								placeholder="Symbol (e.g. AAPL)"
-								className={`inputField flex-1 ${
-									stock.symbol
-										? stock.valid
-											? "border-green-400"
-											: "border-red-400"
-										: ""
-								}`}
-								value={stock.symbol}
-								onChange={(e) =>
-									handleStockChange(
-										index,
-										"symbol",
-										e.target.value.toUpperCase()
-									)
-								}
-								onKeyDown={(e) => {
-									if (e.key === "Enter") {
-										e.preventDefault();
-										addStock();
-									}
-								}}
-							/>
-							<input
-								type="number"
-								step="0.01"
-								placeholder="Target Price"
-								className="inputField flex-1"
-								value={stock.targetPrice}
-								onChange={(e) =>
-									handleStockChange(
-										index,
-										"targetPrice",
-										e.target.value
-									)
-								}
-							/>
-						</div>
+		<div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+			<Card className="bg-[var(--background-100)] dark:bg-[var(--background-200)] border-[var(--background-200)] dark:border-[var(--background-300)] shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+				<CardHeader className="border-b border-[var(--background-200)] dark:border-[var(--background-300)]">
+					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-3">
-							<input
-								type="text"
-								placeholder="Note..."
-								className="inputField flex-1"
-								value={stock.note}
-								onChange={(e) =>
-									handleStockChange(
-										index,
-										"note",
-										e.target.value
-									)
-								}
-							/>
-							{stocks.length > 1 && (
-								<button
-									type="button"
-									onClick={() => removeStock(index)}
-									className="text-red-500 hover:text-red-600 font-bold text-lg"
-								>
-									×
-								</button>
-							)}
+							<div className="w-10 h-10 bg-gradient-to-br from-[var(--primary-500)] to-[var(--accent-500)] rounded-lg flex items-center justify-center">
+								<FolderPlus className="w-5 h-5 text-white" />
+							</div>
+							<div>
+								<CardTitle className="text-xl font-bold text-[var(--text-900)] dark:text-[var(--text-50)]">
+									Create New Watchlist
+								</CardTitle>
+								<p className="text-sm text-[var(--text-600)] dark:text-[var(--text-400)] mt-1">
+									Build your portfolio with stocks you want to track
+								</p>
+							</div>
 						</div>
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={() => {
+								resetForm();
+								onClose();
+							}}
+							className="text-[var(--text-500)] dark:text-[var(--text-400)] hover:text-[var(--text-700)] dark:hover:text-[var(--text-200)]"
+						>
+							<X className="w-5 h-5" />
+						</Button>
 					</div>
-				))}
-				<button
-					type="button"
-					onClick={addStock}
-					className="formButton"
-					disabled={validating}
-				>
-					{validating ? "Validating..." : "Add Stock"}
-				</button>
-			</div>
+				</CardHeader>
 
-			<button
-				type="submit"
-				className={`formButton ${
-					isLoading ? "opacity-50 cursor-not-allowed" : ""
-				}`}
-				disabled={
-					isLoading ||
-					!name.trim() ||
-					stocks.some((s) => s.symbol && !s.valid)
-				}
-			>
-				{isLoading ? "Creating..." : "Create Watchlist"}
-			</button>
+				<CardContent className="p-6">
+					<form onSubmit={handleSubmit} className="space-y-6">
+						{/* Watchlist Name */}
+						<div className="space-y-2">
+							<Label htmlFor="name" className="text-[var(--text-700)] dark:text-[var(--text-300)] font-medium">
+								Watchlist Name *
+							</Label>
+							<Input
+								id="name"
+								type="text"
+								value={name}
+								onChange={(e) => setName(e.target.value)}
+								placeholder="Enter watchlist name"
+								className="bg-[var(--background-50)] dark:bg-[var(--background-100)] border-[var(--background-300)] dark:border-[var(--background-400)] focus:border-[var(--primary-500)] dark:focus:border-[var(--primary-400)] focus:ring-[var(--primary-500)] dark:focus:ring-[var(--primary-400)]"
+								required
+							/>
+						</div>
 
-			{isError && (
-				<div className="text-red-500 mt-2">
-					{error?.response?.data?.message ||
-						error?.message ||
-						"Something went wrong"}
-				</div>
-			)}
-		</form>
+						{/* Stocks Section */}
+						<div className="space-y-4">
+							<div className="flex items-center justify-between">
+								<Label className="text-[var(--text-700)] dark:text-[var(--text-300)] font-medium">
+									Stocks (Optional)
+								</Label>
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									onClick={addStock}
+									disabled={validating || stocks.some(s => s.validating)}
+									className="border-[var(--background-300)] dark:border-[var(--background-400)] text-[var(--text-700)] dark:text-[var(--text-300)] hover:bg-[var(--background-200)] dark:hover:bg-[var(--background-300)]"
+								>
+									<Plus className="w-4 h-4 mr-2" />
+									Add Stock
+								</Button>
+							</div>
+
+							<div className="space-y-4">
+								{stocks.map((stock, index) => (
+									<Card
+										key={index}
+										className={`bg-[var(--background-50)] dark:bg-[var(--background-100)] border-[var(--background-200)] dark:border-[var(--background-300)] ${
+											stock.symbol && stock.valid
+												? "border-green-300 dark:border-green-600"
+												: stock.symbol && !stock.valid && stock.error
+												? "border-red-300 dark:border-red-600"
+												: ""
+										}`}
+									>
+										<CardContent className="p-4 space-y-4">
+											{/* Symbol and Target Price Row */}
+											<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+												<div className="space-y-2">
+													<Label className="text-sm text-[var(--text-600)] dark:text-[var(--text-400)]">
+														Symbol *
+													</Label>
+													<div className="relative">
+														<TrendingUp className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--text-500)] dark:text-[var(--text-400)]" />
+														<Input
+															type="text"
+															placeholder="e.g., AAPL"
+															className={`pl-10 pr-10 bg-[var(--background-100)] dark:bg-[var(--background-200)] border-[var(--background-300)] dark:border-[var(--background-400)] focus:border-[var(--primary-500)] dark:focus:border-[var(--primary-400)] focus:ring-[var(--primary-500)] dark:focus:ring-[var(--primary-400)] ${
+																stock.symbol && stock.valid
+																	? "border-green-400 dark:border-green-500"
+																	: stock.symbol && !stock.valid && stock.error
+																	? "border-red-400 dark:border-red-500"
+																	: ""
+															}`}
+															value={stock.symbol}
+															onChange={(e) =>
+																handleStockChange(
+																	index,
+																	"symbol",
+																	e.target.value.toUpperCase()
+																)
+															}
+															onKeyDown={(e) => {
+																if (e.key === "Enter") {
+																	e.preventDefault();
+																	addStock();
+																}
+															}}
+														/>
+														{/* Validation Status Icon */}
+														<div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+															{stock.validating && (
+																<Loader2 className="w-4 h-4 animate-spin text-[var(--primary-500)]" />
+															)}
+															{stock.valid && !stock.validating && (
+																<CheckCircle className="w-4 h-4 text-green-500" />
+															)}
+															{stock.error && !stock.validating && (
+																<AlertCircle className="w-4 h-4 text-red-500" />
+															)}
+														</div>
+													</div>
+													{/* Error Message */}
+													{stock.error && (
+														<p className="text-xs text-red-500 dark:text-red-400 mt-1">
+															{stock.error}
+														</p>
+													)}
+													{/* Validation Info */}
+													{stock.symbol && !stock.valid && !stock.validating && !stock.error && (
+														<p className="text-xs text-[var(--text-500)] dark:text-[var(--text-400)] mt-1">
+															Validating symbol...
+														</p>
+													)}
+												</div>
+
+												<div className="space-y-2">
+													<Label className="text-sm text-[var(--text-600)] dark:text-[var(--text-400)]">
+														Target Price
+													</Label>
+													<div className="relative">
+														<DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--text-500)] dark:text-[var(--text-400)]" />
+														<Input
+															type="number"
+															step="0.01"
+															placeholder="0.00"
+															className="pl-10 bg-[var(--background-100)] dark:bg-[var(--background-200)] border-[var(--background-300)] dark:border-[var(--background-400)] focus:border-[var(--primary-500)] dark:focus:border-[var(--primary-400)] focus:ring-[var(--primary-500)] dark:focus:ring-[var(--primary-400)]"
+															value={stock.targetPrice}
+															onChange={(e) =>
+																handleStockChange(
+																	index,
+																	"targetPrice",
+																	e.target.value
+																)
+															}
+														/>
+													</div>
+												</div>
+											</div>
+
+											{/* Note Row */}
+											<div className="space-y-2">
+												<Label className="text-sm text-[var(--text-600)] dark:text-[var(--text-400)]">
+													Note
+												</Label>
+												<div className="relative">
+													<FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--text-500)] dark:text-[var(--text-400)]" />
+													<Input
+														type="text"
+														placeholder="Add a note about this stock..."
+														className="pl-10 bg-[var(--background-100)] dark:bg-[var(--background-200)] border-[var(--background-300)] dark:border-[var(--background-400)] focus:border-[var(--primary-500)] dark:focus:border-[var(--primary-400)] focus:ring-[var(--primary-500)] dark:focus:ring-[var(--primary-400)]"
+														value={stock.note}
+														onChange={(e) =>
+															handleStockChange(
+																index,
+																"note",
+																e.target.value
+															)
+														}
+													/>
+												</div>
+											</div>
+
+											{/* Remove Button */}
+											{stocks.length > 1 && (
+												<div className="flex justify-end">
+													<Button
+														type="button"
+														variant="ghost"
+														size="sm"
+														onClick={() => removeStock(index)}
+														className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+													>
+														<Trash2 className="w-4 h-4 mr-2" />
+														Remove
+													</Button>
+												</div>
+											)}
+										</CardContent>
+									</Card>
+								))}
+							</div>
+						</div>
+
+						{/* Error Message */}
+						{isError && (
+							<div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+								<p className="text-red-600 dark:text-red-400 text-sm">
+									{error?.response?.data?.message ||
+										error?.message ||
+										"Something went wrong"}
+								</p>
+							</div>
+						)}
+
+						{/* Submit Button */}
+						<div className="flex gap-3 pt-4">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => {
+									resetForm();
+									onClose();
+								}}
+								className="flex-1 border-[var(--background-300)] dark:border-[var(--background-400)] text-[var(--text-700)] dark:text-[var(--text-300)] hover:bg-[var(--background-200)] dark:hover:bg-[var(--background-300)]"
+							>
+								Cancel
+							</Button>
+							<Button
+								type="submit"
+								disabled={
+									isLoading ||
+									!name.trim() ||
+									stocks.some((s) => s.symbol && !s.valid) ||
+									stocks.some((s) => s.validating)
+								}
+								className="flex-1 bg-gradient-to-r from-[var(--primary-500)] to-[var(--accent-500)] hover:from-[var(--primary-600)] hover:to-[var(--accent-600)] text-white shadow-lg"
+							>
+								{isLoading ? (
+									<>
+										<Loader2 className="w-4 h-4 mr-2 animate-spin" />
+										Creating...
+									</>
+								) : (
+									<>
+										<FolderPlus className="w-4 h-4 mr-2" />
+										Create Watchlist
+									</>
+								)}
+							</Button>
+						</div>
+					</form>
+				</CardContent>
+			</Card>
+		</div>
 	);
 };
 

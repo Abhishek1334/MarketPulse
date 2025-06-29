@@ -89,7 +89,6 @@ export const getTimeSeriesStockDatafromExternalAPI = async (
 	}
 	const formatDate = (date) => date.toISOString().split("T")[0]; 
 
-	console.log(`symbol: ${symbol}, interval: ${interval}, startDate: ${startDate}, endDate: ${endDate}`);
 
 	try {
 		const response = await axios.get(
@@ -101,7 +100,6 @@ export const getTimeSeriesStockDatafromExternalAPI = async (
 			}
 		);
 
-		console.log("Response data from external API:", response.data);
 
 		return response.data; // Return the entire response.data object
 	} catch (error) {

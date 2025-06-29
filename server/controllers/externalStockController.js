@@ -144,7 +144,6 @@ export const getStockChartData = async (req, res, next) => {
 			interval,
 			includePrePost: false,
 		});
-		console.log(chartData)
 		// Validate response structure
 		if (!chartData?.quotes || !Array.isArray(chartData.quotes)) {
 			throw createError(502, "Invalid data format from financial API");

@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { getASingleWatchlist } from "@/api/watchlist";
-import { showError, showSuccess } from "@/utils/toast";
+import { showError, showSuccess } from "@/utils/toast.jsx";
 import WatchlistHeader from "@/components/Watchlist/WatchlistHeader";
 import StockList from "@/components/Watchlist/StockList";
 import StockPreviewBox from "@/components/Watchlist/StockPreviewBox";
 import { useQuery } from "@tanstack/react-query";
 import BackButton from "@/components/BackButton";
 import { getStockDataforWatchlist } from "@/api/analyse";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown, Loader2, AlertCircle, Info } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 const WatchlistPage = () => {
 	const { watchlistId } = useParams();
@@ -63,57 +64,64 @@ const WatchlistPage = () => {
 
 	if (isLoading || stockLoading) {
 		return (
-			<div className="flex flex-col gap-4 justify-center items-center h-[calc(100vh-4rem)] text-[var(--text-600)] px-4">
-				<div className="animate-spin rounded-full w-8 h-8 sm:w-10 sm:h-10 border-t-2 border-b-2 border-[var(--primary-600)]"></div>
-				<p className="text-base sm:text-lg font-medium text-center">Loading watchlist...</p>
+			<div className="min-h-screen bg-gradient-to-br from-[var(--background-50)] to-[var(--background-100)] dark:from-[var(--background-50)] dark:to-[var(--background-100)] flex items-center justify-center">
+				<Card className="bg-[var(--background-100)]/80 dark:bg-[var(--background-200)]/80 backdrop-blur-sm border-[var(--background-200)] dark:border-[var(--background-300)] shadow-xl p-8">
+					<CardContent className="flex flex-col items-center gap-4">
+						<Loader2 className="h-8 w-8 animate-spin text-[var(--primary-500)] dark:text-[var(--primary-400)]" />
+						<p className="text-lg font-medium text-[var(--text-700)] dark:text-[var(--text-300)]">Loading watchlist...</p>
+					</CardContent>
+				</Card>
 			</div>
 		);
 	}
 
 	if (isError || stockError) {
 		return (
-			<div className="flex flex-col gap-4 justify-center items-center h-[calc(100vh-4rem)] text-base sm:text-lg text-[var(--accent-600)] px-4">
-				<p className="text-center">{error?.message || "Something went wrong fetching stock data."}</p>
-				<BackButton locationAddress="" locationName="Watchlist" />
+			<div className="min-h-screen bg-gradient-to-br from-[var(--background-50)] to-[var(--background-100)] dark:from-[var(--background-50)] dark:to-[var(--background-100)] flex items-center justify-center p-4">
+				<Card className="bg-[var(--background-100)]/80 dark:bg-[var(--background-200)]/80 backdrop-blur-sm border-[var(--background-200)] dark:border-[var(--background-300)] shadow-xl p-8 max-w-md">
+					<CardContent className="flex flex-col items-center gap-4 text-center">
+						<AlertCircle className="h-12 w-12 text-[var(--accent-500)] dark:text-[var(--accent-400)]" />
+						<p className="text-lg font-medium text-[var(--text-700)] dark:text-[var(--text-300)]">
+							{error?.message || "Something went wrong fetching stock data."}
+						</p>
+						<BackButton locationAddress="/dashboard" locationName="Dashboard" />
+					</CardContent>
+				</Card>
 			</div>
 		);
 	}
 
 	return (
-		<div className="flex flex-col min-h-screen bg-[var(--background-50)]">
-			{/* Header */}
-			<div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6">
-				<BackButton
-					locationAddress="/dashboard"
-					locationName="Dashboard"
-					className="text-[var(--text-600)] hover:text-[var(--text-800)] transition-colors mb-4"
-				/>
-				<WatchlistHeader watchlistData={watchlistData || {}} />
-			</div>
-
-			{/* Main Content */}
-			<div className="flex-1 px-4 sm:px-6 lg:px-10 pb-4 sm:pb-6">
-				{/* Desktop Layout */}
-				<div className="hidden lg:flex gap-6 h-full">
-					<div className="flex-1 min-w-0">
-						<StockList
-							watchlistId={watchlistId}
-							loading={isLoading}
-							handlePreviewStock={handlePreviewStock}
-						/>
-					</div>
-					<div className="w-80 xl:w-96 flex-shrink-0">
-						<StockPreviewBox
-							previewStock={previewStock}
-							setPreviewStock={setPreviewStock}
-							stockData={stockData}
-						/>
-					</div>
+		<div className="min-h-screen bg-gradient-to-br from-[var(--background-50)] to-[var(--background-100)] dark:from-[var(--background-50)] dark:to-[var(--background-100)]">
+			<div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+				{/* Header Section */}
+				<div className="mb-8">
+					<BackButton
+						locationAddress="/dashboard"
+						locationName="Dashboard"
+						className="text-[var(--text-600)] dark:text-[var(--text-400)] hover:text-[var(--text-800)] dark:hover:text-[var(--text-200)] transition-colors mb-6"
+					/>
+					<WatchlistHeader watchlistData={watchlistData || {}} />
 				</div>
 
-				{/* Mobile Layout */}
-				<div className="lg:hidden flex flex-col gap-4 h-full">
-					<div className="flex-1 min-h-0">
+				{/* Mobile Help Note - Only visible on small screens */}
+				<div className="lg:hidden mb-4">
+					<Card className="bg-gradient-to-r from-[var(--primary-50)] to-[var(--accent-50)] dark:from-[var(--primary-900)]/20 dark:to-[var(--accent-900)]/20 border-[var(--primary-200)] dark:border-[var(--primary-800)] shadow-sm">
+						<CardContent className="p-3">
+							<div className="flex items-center gap-2">
+								<Info className="w-4 h-4 text-[var(--primary-600)] dark:text-[var(--primary-400)] flex-shrink-0" />
+								<p className="text-sm text-[var(--primary-700)] dark:text-[var(--primary-300)] font-medium">
+									💡 Tap on any stock to view detailed information at the bottom of the page
+								</p>
+							</div>
+						</CardContent>
+					</Card>
+				</div>
+
+				{/* Main Content */}
+				<div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+					{/* Stock List - Takes 3 columns on desktop */}
+					<div className="lg:col-span-3">
 						<StockList
 							watchlistId={watchlistId}
 							loading={isLoading}
@@ -121,35 +129,51 @@ const WatchlistPage = () => {
 						/>
 					</div>
 
-					{/* Mobile Preview Panel */}
-					{previewStock && (
-						<div className="relative">
-							<button
-								onClick={() => setIsPreviewOpen(!isPreviewOpen)}
-								className="w-full bg-[var(--primary-600)] hover:bg-[var(--primary-700)] text-white py-3 px-4 rounded-lg flex items-center justify-between transition-colors"
-							>
-								<span className="font-medium">
-									{previewStock.symbol} Details
-								</span>
-								{isPreviewOpen ? (
-									<ChevronDown className="w-5 h-5" />
-								) : (
-									<ChevronUp className="w-5 h-5" />
-								)}
-							</button>
-							
-							{isPreviewOpen && (
-								<div className="mt-2 animate-in slide-in-from-bottom-2 duration-200">
-									<StockPreviewBox
-										previewStock={previewStock}
-										setPreviewStock={setPreviewStock}
-										stockData={stockData}
-										isMobile={true}
-									/>
-								</div>
+					{/* Stock Preview - Takes 1 column on desktop */}
+					<div className="lg:col-span-1">
+						{/* Desktop Preview */}
+						<div className="hidden lg:block">
+							<StockPreviewBox
+								previewStock={previewStock}
+								setPreviewStock={setPreviewStock}
+								stockData={stockData}
+							/>
+						</div>
+
+						{/* Mobile Preview */}
+						<div className="lg:hidden">
+							{previewStock && (
+								<Card className="bg-[var(--background-100)]/80 dark:bg-[var(--background-200)]/80 backdrop-blur-sm border-[var(--background-200)] dark:border-[var(--background-300)] shadow-lg">
+									<CardContent className="p-0">
+										<button
+											onClick={() => setIsPreviewOpen(!isPreviewOpen)}
+											className="w-full bg-gradient-to-r from-[var(--primary-500)] to-[var(--accent-500)] hover:from-[var(--primary-600)] hover:to-[var(--accent-600)] text-white py-4 px-6 rounded-t-lg flex items-center justify-between transition-all duration-200 shadow-lg"
+										>
+											<span className="font-semibold text-lg">
+												{previewStock.symbol} Details
+											</span>
+											{isPreviewOpen ? (
+												<ChevronDown className="w-5 h-5 transition-transform duration-200" />
+											) : (
+												<ChevronUp className="w-5 h-5 transition-transform duration-200" />
+											)}
+										</button>
+										
+										{isPreviewOpen && (
+											<div className="animate-in slide-in-from-bottom-2 duration-300">
+												<StockPreviewBox
+													previewStock={previewStock}
+													setPreviewStock={setPreviewStock}
+													stockData={stockData}
+													isMobile={true}
+												/>
+											</div>
+										)}
+									</CardContent>
+								</Card>
 							)}
 						</div>
-					)}
+					</div>
 				</div>
 			</div>
 		</div>
