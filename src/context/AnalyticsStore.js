@@ -7,7 +7,6 @@ export const useAnalyticsStore = create((set) => ({
 
 	stockData: [],
 	setStockData: (data) => {
-		console.log("Data in setStockData:", data);
 		set({ stockData: data });
 	},
 

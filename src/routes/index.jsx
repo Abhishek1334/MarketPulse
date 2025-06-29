@@ -5,6 +5,7 @@ import RegisterPage from "../pages/RegisterPage";
 import DashboardPage from "../pages/DashboardPage";
 import WatchlistPage from "../pages/WatchlistPage";
 import AnalyticsPage from "../pages/AnalyticsPage";
+import PortfolioPage from "../pages/PortfolioPage";
 import ProtectedRoute from "./ProtectedRoute";
 import HomePage from "../pages/Homepage";
 import Layout from "../components/Layout";
@@ -39,6 +40,10 @@ export const router = createBrowserRouter([
 							{
 								path: "dashboard",
 								element: <DashboardPage />,
+							},
+							{
+								path: "portfolio",
+								element: <PortfolioPage />,
 							},
 							{
 								path: "watchlist/:watchlistId",

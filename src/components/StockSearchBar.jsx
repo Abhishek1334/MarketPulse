@@ -84,9 +84,9 @@ const StockSearchBar = ({ onSelect, isExpanded, onClose, className }) => {
 					placeholder="Search stocks (e.g. AAPL, TSLA)"
 					value={query}
 					onChange={handleSearch}
-					className="w-full pl-10 pr-10 py-2 rounded-lg border border-[var(--secondary-200)] 
+					className="w-full pl-10 pr-10 py-2 rounded-lg border border-[var(--secondary-200)] dark:border-[var(--secondary-300)] 
                 focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                bg-[var(--secondary-50)] placeholder-[var(--secondary-400)] text-[var(--text-950)]"
+                bg-[var(--secondary-50)] dark:bg-[var(--background-200)] placeholder-[var(--secondary-400)] dark:placeholder-[var(--text-400)] text-[var(--text-950)] dark:text-[var(--text-50)]"
 				/>
 				<div className="absolute right-3 flex items-center space-x-2">
 					{isLoading && (
@@ -105,30 +105,30 @@ const StockSearchBar = ({ onSelect, isExpanded, onClose, className }) => {
 
 			{results.length > 0 && (
 				<div
-					className="absolute top-full left-0 right-0 mt-1 bg-[var(--secondary-100)] scrollable-content rounded-lg shadow-lg border-1
-					border-[var(--secondary-200)] max-h-60 overflow-y-auto z-50 font-semibold p-1 "
+					className="absolute top-full left-0 right-0 mt-1 bg-[var(--secondary-100)] dark:bg-[var(--background-200)] scrollable-content rounded-lg shadow-lg border-1
+					border-[var(--secondary-200)] dark:border-[var(--secondary-300)] max-h-60 overflow-y-auto z-50 font-semibold p-1 "
 				>
 					{results.map((stock) => (
 						<button
 							key={stock.symbol}
 							onClick={() => handleSelect(stock)}
-							className="w-full px-4 py-2 text-left hover:bg-[var(--secondary-100)] flex items-center justify-between"
+							className="w-full px-4 py-2 text-left hover:bg-[var(--secondary-100)] dark:hover:bg-[var(--background-300)] flex items-center justify-between"
 						>
 							<div>
-								<div className="font-medium text-[var(--text-950)]">
+								<div className="font-medium text-[var(--text-950)] dark:text-[var(--text-50)]">
 									{stock.symbol}
 								</div>
-								<div className="text-sm text-[var(--text-600)]">
+								<div className="text-sm text-[var(--text-600)] dark:text-[var(--text-300)]">
 									{stock.shortname}
 								</div>
 							</div>
 							<div className="flex items-center h-full">
-								<div className="text-xs bg-[var(--secondary-200)] text-purple-600 px-2 py-1 rounded">
+								<div className="text-xs bg-[var(--secondary-200)] dark:bg-[var(--background-300)] text-purple-600 dark:text-purple-400 px-2 py-1 rounded">
 									{stock.type || "Stock"}
 								</div>
 								<div className="ml-2 flex items-center">
 									<div
-										className="text-[var(--secondary-400)] hover:text-[var(--secondary-500)] "
+										className="text-[var(--secondary-400)] hover:text-[var(--secondary-500)] dark:text-[var(--text-400)] dark:hover:text-[var(--text-300)]"
 										onClick={(e) => {
 											e.preventDefault();
 											e.stopPropagation();	
@@ -136,7 +136,7 @@ const StockSearchBar = ({ onSelect, isExpanded, onClose, className }) => {
 										}}
 										
 									>
-										<PlusSquare className="h-5 w-5 text-[var(--secondary-400)]" />
+										<PlusSquare className="h-5 w-5 text-[var(--secondary-400)] dark:text-[var(--text-400)]" />
 									</div>
 								</div>
 							</div>

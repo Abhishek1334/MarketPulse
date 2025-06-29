@@ -9,7 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useStore from "../context/Store";
 import { useEffect, useState } from "react";
 import { AddStockToWatchlist } from "../api/stock";
-import { showError, showSuccess } from "../utils/toast";
+import { showError, showSuccess } from "../utils/toast.jsx";
 
 const AddStockModal = ({ open, setOpen, stock }) => {
 	const { watchlists, addStockToWatchlist } = useStore((state) => state);
@@ -88,14 +88,14 @@ const AddStockModal = ({ open, setOpen, stock }) => {
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogContent className="sm:max-w-[425px] bg-[var(--background-900)] text-[var(--text-50)]">
+			<DialogContent className="sm:max-w-[425px] bg-[var(--background-900)] dark:bg-[var(--background-100)] text-[var(--text-50)] dark:text-[var(--text-950)]">
 				<DialogHeader>
-					<DialogTitle className="text-lg font-semibold">
+					<DialogTitle className="text-lg font-semibold text-[var(--text-50)] dark:text-[var(--text-950)]">
 						Adding Stock: {stock?.symbol || stock}
 					</DialogTitle>
 				</DialogHeader>
 
-				<DialogDescription>
+				<DialogDescription className="text-[var(--text-300)] dark:text-[var(--text-600)]">
 					Please select the watchlists you want to add this stock to.
 				</DialogDescription>
 
@@ -113,9 +113,9 @@ const AddStockModal = ({ open, setOpen, stock }) => {
 									type="checkbox"
 									id={watchlist._id}
 									name={watchlist.name}
-									className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+									className="w-4 h-4 text-[var(--primary-600)] bg-[var(--background-100)] dark:bg-[var(--background-200)] border-[var(--border)] dark:border-[var(--background-300)] rounded focus:ring-[var(--primary-500)]"
 								/>
-								<label htmlFor={watchlist._id}>
+								<label htmlFor={watchlist._id} className="text-[var(--text-50)] dark:text-[var(--text-950)]">
 									{watchlist.name}
 								</label>
 							</div>
@@ -126,7 +126,7 @@ const AddStockModal = ({ open, setOpen, stock }) => {
 						<button
 							type="button"
 							onClick={() => setOpen(false)}
-							className="font-[Raleway] border-2 border-[var(--background-50)] px-3 py-2 rounded-2xl text-base font-semibold text-[var(--background-50)]"
+							className="font-[Raleway] border-2 border-[var(--background-50)] dark:border-[var(--background-300)] px-3 py-2 rounded-2xl text-base font-semibold text-[var(--background-50)] dark:text-[var(--text-950)] hover:bg-[var(--background-50)] dark:hover:bg-[var(--background-300)] hover:text-[var(--text-950)] dark:hover:text-[var(--text-50)] transition-colors"
 						>
 							Cancel
 						</button>
@@ -134,7 +134,7 @@ const AddStockModal = ({ open, setOpen, stock }) => {
 						<button
 							type="submit"
 							disabled={isAdding}
-							className="font-[Raleway] border-2 border-[var(--background-50)] px-3 py-2 rounded-2xl text-base font-semibold text-[var(--background-50)] disabled:opacity-50 disabled:cursor-not-allowed"
+							className="font-[Raleway] border-2 border-[var(--primary-600)] dark:border-[var(--primary-500)] px-3 py-2 rounded-2xl text-base font-semibold text-[var(--primary-600)] dark:text-[var(--primary-500)] hover:bg-[var(--primary-600)] dark:hover:bg-[var(--primary-500)] hover:text-white dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
 						>
 							{isAdding ? "Adding..." : "Add"}
 						</button>

@@ -36,19 +36,17 @@ const useRateLimitedFetch = () => {
 			const now = Date.now();
 
 			if (cached && now - cached.timestamp < CACHE_TTL) {
-				console.log(`Cache hit for ${key}:`, cached.data);
+				(`Cache hit for ${key}:`, cached.data);
 				return { success: true, data: cached.data };
 			}
 
 			if (apiCallsInCurrentMinute >= MAX_REQUESTS_PER_MINUTE) {
-				console.log("Rate limit exceeded (minute)");
 				return {
 					success: false,
 					error: "Rate limit exceeded (minute)",
 				};
 			}
 			if (apiCallsToday >= MAX_REQUESTS_PER_DAY) {
-				console.log("Rate limit exceeded (day)");
 				return { success: false, error: "Rate limit exceeded (day)" };
 			}
 
@@ -59,10 +57,6 @@ const useRateLimitedFetch = () => {
 					startDate,
 					endDate
 				);
-				console.log("API Response from external service:", response);
-				console.log("typeof response:", typeof response);
-				console.log("Is array:", Array.isArray(response));
-				console.log("Length:", response?.length);
 				if (response && !response.status?.includes("error")) {
 					stockDataCache[key] = { data: response, timestamp: now };
 					apiCallsInCurrentMinute++;
@@ -70,7 +64,6 @@ const useRateLimitedFetch = () => {
 					return { success: true, data: response };
 				}
 
-				console.log("Failed to fetch data:", response);
 				return { success: false, error: "Failed to fetch data" };
 			} catch (error) {
 				console.error("Fetch error:", error);
@@ -92,10 +85,6 @@ const processQueue = useCallback(async () => {
 				nextRequest.endDate
 			);
 
-			console.log(
-				`Processing request for ${nextRequest.symbol} - Result:`,
-				result
-			);
 
 			if (isMountedRef.current) {
 				const key = makeCacheKey(
@@ -107,12 +96,7 @@ const processQueue = useCallback(async () => {
 
 				// Update both cache and results state
 				setResults((prev) => {
-					console.log("Setting results:", {
-						...prev,
-						[key]: result.success
-							? result.data
-							: { error: result.error },
-					});
+					
 					return {
 						...prev,
 						[key]: result.success
@@ -153,7 +137,6 @@ const processQueue = useCallback(async () => {
 		(symbol, interval = "1d", startDate, endDate) => {
 			const key = makeCacheKey(symbol, interval, startDate, endDate);
 
-			console.log(`Adding to queue: ${key}`);
 
 			setQueue((prev) => {
 				const existsInQueue = prev.some(
@@ -174,7 +157,6 @@ const processQueue = useCallback(async () => {
 						...prevResults,
 						[key]: cached.data,
 					}));
-					console.log("Cache hit. Returning data:", cached.data);
 					return prev;
 				}
 

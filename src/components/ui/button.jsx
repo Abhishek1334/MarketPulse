@@ -5,17 +5,17 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-	"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+	"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
 	{
 		variants: {
 			variant: {
-				default: "bg-blue-600 text-white hover:bg-blue-700",
-				destructive: "bg-red-500 text-white hover:bg-red-600",
+				default: "bg-[var(--primary-600)] text-[var(--text-50)] hover:bg-[var(--primary-700)] dark:bg-[var(--primary-500)] dark:text-[var(--text-50)] dark:hover:bg-[var(--primary-600)]",
+				destructive: "bg-red-500 text-white hover:bg-red-600 dark:bg-[var(--danger-500)] dark:text-[var(--text-50)] dark:hover:bg-red-600",
 				outline:
-					"border border-gray-300 bg-white hover:bg-gray-100 hover:text-gray-900",
-				secondary: "bg-gray-200 text-gray-900 hover:bg-gray-300",
-				ghost: "hover:bg-gray-100 hover:text-gray-900",
-				link: "text-blue-600 underline-offset-4 hover:underline",
+					"border border-[var(--border)] bg-[var(--background-50)] hover:bg-[var(--background-100)] hover:text-[var(--text-950)] dark:bg-[var(--background-200)] dark:text-[var(--text-50)] dark:border-[var(--border-color)] dark:hover:bg-[var(--background-300)]",
+				secondary: "bg-[var(--secondary-200)] text-[var(--text-950)] hover:bg-[var(--secondary-300)] dark:bg-[var(--background-300)] dark:text-[var(--text-50)] dark:hover:bg-[var(--background-400)]",
+				ghost: "hover:bg-[var(--background-100)] hover:text-[var(--text-950)] dark:text-[var(--text-50)] dark:hover:bg-[var(--background-300)]",
+				link: "text-blue-600 underline-offset-4 hover:underline dark:text-[var(--primary-400)]",
 			},
 			size: {
 				default: "h-10 px-4 py-2",

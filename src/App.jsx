@@ -4,6 +4,8 @@ import useStore from "./context/Store";
 import { Slide, ToastContainer } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
 import { getWatchlistsByUser } from "@/api/watchlist";
+import FloatingSocial from "@/components/FloatingSocial";
+import PriceAlertManager from "@/components/PriceAlertManager";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect } from "react";
 
@@ -33,12 +35,25 @@ function App() {
 			<ToastContainer
 				transition={Slide}
 				position="top-right"
-				autoClose={2500}
-				theme="light"
+				autoClose={3000}
+				hideProgressBar
+				newestOnTop
 				closeOnClick
+				rtl={false}
+				pauseOnFocusLoss
 				draggable
+				pauseOnHover
+				theme="light"
+				toastClassName="!p-0 !m-0 !shadow-lg !rounded-xl !border-0"
+				bodyClassName="!p-0 !m-0"
+				style={{
+					fontSize: '14px',
+					fontWeight: '500'
+				}}
 			/>
 			<Outlet />
+			<FloatingSocial />
+			<PriceAlertManager />
 		</div>
 	);
 }
