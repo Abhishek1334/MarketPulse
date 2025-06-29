@@ -21,7 +21,6 @@ LIVE SITE: https://market-pulse-two.vercel.app/
 - 🧑‍💼 **Portfolio Management** (track holdings, performance, sector allocation)
 - 🧠 **Technical Indicators** (RSI, MACD, SMA, EMA, Bollinger Bands)
 - 🛎️ **Advanced Price Alerts** (price, % change, volume, technical triggers)
-- 📅 Customizable Timeframes (1D, 1W, 1M, 3M, 1Y, ALL)
 - 🔄 Toggle Metrics: Open, Close, High, Low, Volume
 - 🗂️ Watchlists & Quick Stock Search
 - 🧩 Modular, Scalable Component Architecture
