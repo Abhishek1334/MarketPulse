@@ -14,10 +14,7 @@ const app = express(); // Initialize Express first
 
 // CORS Configuration
 const corsOptions = {
-	origin: [
-		"https://market-pulse-two.vercel.app",
-		"http://localhost:5173", // Add localhost for development
-	],
+	origin: "https://market-pulse-two.vercel.app",
 	methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Array format
 	allowedHeaders: ["Content-Type", "Authorization"],
 	credentials: true,
