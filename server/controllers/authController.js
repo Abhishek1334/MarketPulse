@@ -17,6 +17,8 @@ const registerUser = async (req, res) => {
 		    throw createError( "Invalid email.",400);
 		}
 		
+		// Check if user already exists
+		const existingUser = await User.findOne({ email });
 		if (existingUser) {
 		    throw createError( "User already exists.",409);
 		}
