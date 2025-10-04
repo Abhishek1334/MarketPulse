@@ -10,15 +10,15 @@ const registerUser = async (req, res) => {
 		const { name, email, password } = req.body;
 
 		if (!name || !email || !password) {
-		    throw createError(400, "All the fields are required.");
+		    throw createError("All the fields are required.",400);
 		}
 		
 		if (!validator.isEmail(email)) {
-		    throw createError(400, "Invalid email.");
+		    throw createError( "Invalid email.",400);
 		}
 		
 		if (existingUser) {
-		    throw createError(409, "User already exists.");
+		    throw createError( "User already exists.",409);
 		}
 
 		const newUser = new User({ name, email, password });
@@ -42,7 +42,7 @@ const registerUser = async (req, res) => {
 		});
 	} catch (error) {
 		console.error(error);
-		throw createError(error.statusCode || 500,error.message);
+		throw createError(error.message,error.statusCode || 500);
 	}
 };
 
@@ -52,19 +52,19 @@ const loginUser = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
 		if (!email || !password) {
-			throw createError(400,"All the fields are required.");
+			throw createError("All the fields are required.",400);
 		}
 
 		const user = await User.findOne({ email });
 
 		if (!user) {
-			throw createError(404,"User not found.");
+			throw createError("User not found.",404);
 		}
 
 		const isPasswordValid = await bcrypt.compare(password, user.password);
 
 		if (!isPasswordValid) {
-			throw createError(401,"Invalid password.");
+			throw createError("Invalid password.",401);
 		}
 
 		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
