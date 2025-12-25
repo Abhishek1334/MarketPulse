@@ -4,10 +4,16 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 // https://vite.dev/config/
 export default defineConfig({
-	resolve: {
-		server: {
-			historyApiFallback: true,
+	server: {
+		historyApiFallback: true,
+		proxy: {
+			'/api': {
+				target: 'http://localhost:5000',
+				changeOrigin: true,
+			},
 		},
+	},
+	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "src"),
 		},
