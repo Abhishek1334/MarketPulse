@@ -1,7 +1,6 @@
 import axios from "axios";
 import { createError } from "../utils/createError.js";
 import { validateStockSymbol } from "../utils/validateStockSymbol.js";
-import yahooFinance from "yahoo-finance2";
 
 
 export const getStockData = async (req, res, next) => {
@@ -72,25 +71,64 @@ export const getStockDataforWatchlist = async (req, res, next) => {
 	}
 
 	try {
-		const results = await yahooFinance.quote(symbols);
+		// Twelve Data supports multiple symbols in one request
+		const symbolsString = symbols.join(",");
+		
+		const response = await axios.get(
+			`https://api.twelvedata.com/quote`,
+			{
+				params: {
+					symbol: symbolsString,
+					apikey: process.env.TWELVE_DATA_API_KEY
+				}
+			}
+		);
 
-		const formatted = results.map((stock) => ({
-			symbol: stock.symbol,
-			name: stock.shortName,
-			price: stock.regularMarketPrice,
-			change: stock.regularMarketChange,
-			changePercent: stock.regularMarketChangePercent,
-			marketCap: stock.marketCap,
-			dayHigh: stock.regularMarketDayHigh,
-			dayLow: stock.regularMarketDayLow,
-			volume: stock.regularMarketVolume,
-			fiftyTwoWeekHigh: stock.fiftyTwoWeekHigh,
-			fiftyTwoWeekLow: stock.fiftyTwoWeekLow,
-		}));
+		// Handle both single and multiple symbol responses
+		let quotes = [];
+		if (Array.isArray(response.data)) {
+			quotes = response.data;
+		} else if (response.data.symbol) {
+			// Single symbol response
+			quotes = [response.data];
+		} else if (response.data.data) {
+			// Response wrapped in data property
+			quotes = Array.isArray(response.data.data) ? response.data.data : [response.data.data];
+		}
+
+		const formatted = quotes.map((stock) => {
+			// Calculate change and changePercent if not provided
+			const price = parseFloat(stock.close || stock.price || 0);
+			const previousClose = parseFloat(stock.previous_close || 0);
+			const change = previousClose ? price - previousClose : parseFloat(stock.change || 0);
+			const changePercent = previousClose ? ((change / previousClose) * 100) : parseFloat(stock.percent_change || 0);
+
+			return {
+				symbol: stock.symbol,
+				name: stock.name || stock.instrument_name || stock.symbol,
+				price: price,
+				change: change,
+				changePercent: changePercent,
+				marketCap: stock.market_cap ? parseFloat(stock.market_cap) : null,
+				dayHigh: parseFloat(stock.high || 0),
+				dayLow: parseFloat(stock.low || 0),
+				volume: parseInt(stock.volume || 0),
+				fiftyTwoWeekHigh: parseFloat(stock["52_week_high"] || stock.fifty_two_week_high || 0),
+				fiftyTwoWeekLow: parseFloat(stock["52_week_low"] || stock.fifty_two_week_low || 0),
+			};
+		});
 
 		res.json(formatted);
 	} catch (error) {
-		console.error(error.response?.data || error.message);
+		console.error("Watchlist stock data error:", error.response?.data || error.message);
+		
+		// Handle Twelve Data API errors
+		if (error.response?.data?.status === "error") {
+			const errorMessage = error.response.data.message || "Failed to fetch stock data";
+			const statusCode = error.response.data.code === 429 ? 429 : 500;
+			return next(createError(errorMessage, statusCode));
+		}
+		
 		next(createError("Failed to fetch stock data", 500));
 	}
 };
@@ -133,33 +171,59 @@ export const getStockChartData = async (req, res, next) => {
 			throw createError(400, "End date must be after start date");
 		}
 
-		// Convert to UNIX timestamps
-		const period1 = Math.floor(start.getTime() / 1000);
-		const period2 = Math.floor(end.getTime() / 1000);
+		// Format dates for Twelve Data API (YYYY-MM-DD)
+		const formatDate = (date) => date.toISOString().split("T")[0];
+		const startDateStr = formatDate(start);
+		const endDateStr = formatDate(end);
 		
-		// Fetch data from Yahoo Finance
-		const chartData = await yahooFinance.chart(cleanedSymbol, {
-			period1,
-			period2,
-			interval,
-			includePrePost: false,
-		});
+		// Map interval format (Twelve Data uses different format)
+		const intervalMap = {
+			"1m": "1min",
+			"5m": "5min",
+			"15m": "15min",
+			"30m": "30min",
+			"1h": "1hour",
+			"4h": "4hour",
+			"1d": "1day",
+			"1w": "1week",
+			"1mo": "1month"
+		};
+		const twelveDataInterval = intervalMap[interval] || interval;
+		
+		// Fetch data from Twelve Data time_series endpoint
+		const response = await axios.get(
+			`https://api.twelvedata.com/time_series`,
+			{
+				params: {
+					symbol: cleanedSymbol,
+					interval: twelveDataInterval,
+					start_date: startDateStr,
+					end_date: endDateStr,
+					apikey: process.env.TWELVE_DATA_API_KEY,
+					format: "JSON"
+				}
+			}
+		);
+
 		// Validate response structure
-		if (!chartData?.quotes || !Array.isArray(chartData.quotes)) {
+		if (response.data.status === "error") {
+			throw createError(400, response.data.message || "Invalid data format from financial API");
+		}
+
+		if (!response.data.values || !Array.isArray(response.data.values)) {
 			throw createError(502, "Invalid data format from financial API");
 		}
 
 		// Process and validate quotes
-		const values = chartData.quotes
+		const values = response.data.values
 			.map((quote) => {
 				try {
 					return {
-						datetime:
-							quote.date?.toISOString().split("T")[0] || null,
-						open: parseFloat(quote.open?.toFixed(2)) || null,
-						high: parseFloat(quote.high?.toFixed(2)) || null,
-						low: parseFloat(quote.low?.toFixed(2)) || null,
-						close: parseFloat(quote.close?.toFixed(2)) || null,
+						datetime: quote.datetime || null,
+						open: parseFloat(quote.open) || null,
+						high: parseFloat(quote.high) || null,
+						low: parseFloat(quote.low) || null,
+						close: parseFloat(quote.close) || null,
 						volume: parseInt(quote.volume) || null,
 					};
 				} catch (error) {
@@ -174,7 +238,8 @@ export const getStockChartData = async (req, res, next) => {
 					item.high !== null &&
 					item.low !== null &&
 					item.close !== null
-			);
+			)
+			.reverse(); // Twelve Data returns newest first, reverse to get chronological order
 
 		if (values.length === 0) {
 			throw createError(
@@ -185,11 +250,11 @@ export const getStockChartData = async (req, res, next) => {
 
 		// Build metadata
 		const meta = {
-			symbol: chartData.meta?.symbol || cleanedSymbol.toUpperCase(),
-			exchange: chartData.meta?.fullExchangeName || "Unknown Exchange",
-			currency: chartData.meta?.currency || "USD",
-			timezone: chartData.meta?.exchangeTimezoneName || "UTC",
-			dataGranularity: chartData.meta?.dataGranularity || interval,
+			symbol: response.data.meta?.symbol || cleanedSymbol.toUpperCase(),
+			exchange: response.data.meta?.exchange || "Unknown Exchange",
+			currency: response.data.meta?.currency || "USD",
+			timezone: response.data.meta?.exchange_timezone || "UTC",
+			dataGranularity: response.data.meta?.interval || interval,
 		};
 		res.status(200).json({
 			success: true,
@@ -223,15 +288,69 @@ export const searchStock = async (req, res, next) => {
 			throw createError("Search Query is required.", 400);
 		}
 
-		const result = await yahooFinance.search(query);
-
-		const stocksOnly = result.quotes.filter(
-			(item) => item.quoteType === "EQUITY"
+		// Use Twelve Data symbol_search endpoint
+		const response = await axios.get(
+			`https://api.twelvedata.com/symbol_search`,
+			{
+				params: {
+					symbol: query,
+					apikey: process.env.TWELVE_DATA_API_KEY
+				}
+			}
 		);
+
+		// Check if result is valid
+		if (!response.data || response.data.status === "error") {
+			throw createError(response.data?.message || "No search results found", 404);
+		}
+
+		// Filter for stocks only (type: "Common Stock" or "Equity")
+		const data = response.data.data || [];
+		const stocksOnly = data
+			.filter((item) => {
+				const instrumentType = item.instrument_type?.toLowerCase() || "";
+				return instrumentType === "common stock" || 
+				       instrumentType === "equity" || 
+				       instrumentType === "stock" ||
+				       !instrumentType; // Include if type is not specified
+			})
+			.map((item) => ({
+				symbol: item.symbol,
+				shortname: item.instrument_name || item.name || item.symbol,
+				longname: item.instrument_name || item.name || item.symbol,
+				quoteType: "EQUITY",
+				type: item.instrument_type || "Stock",
+				exchange: item.exchange || "Unknown"
+			}));
+
+		if (stocksOnly.length === 0) {
+			throw createError("No stock results found", 404);
+		}
 
 		res.status(200).json(stocksOnly);
 	} catch (error) {
-		console.error(error);
-		next(createError("Internal Server Error", 500));
+		console.error("Search stock error:", error);
+		
+		// Handle Twelve Data API errors
+		if (error.response?.data?.status === "error") {
+			const errorMessage = error.response.data.message || "API error";
+			const statusCode = error.response.data.code === 429 ? 429 : 400;
+			return next(createError(errorMessage, statusCode));
+		}
+		
+		// Handle network/API errors
+		if (error.response) {
+			const statusCode = error.response.status || 500;
+			const errorMessage = error.response.data?.message || error.response.statusText || "External API error";
+			return next(createError(errorMessage, statusCode));
+		}
+		
+		// Handle custom errors
+		if (error.statusCode) {
+			return next(createError(error.message || "Failed to search stocks", error.statusCode));
+		}
+		
+		// Generic error fallback
+		next(createError(error.message || "Internal Server Error", 500));
 	}
 };

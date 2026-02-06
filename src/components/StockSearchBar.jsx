@@ -10,6 +10,7 @@ const StockSearchBar = ({ onSelect, isExpanded, onClose, className }) => {
 	const searchRef = useRef(null);
 	const [showModal, setShowModal] = useState(false);
 	const [stockSymbol, setStockSymbol] = useState("");
+	const debounceTimerRef = useRef(null);
 
 	useEffect(() => {
 		const handleClickOutside = (event) => {
@@ -27,23 +28,47 @@ const StockSearchBar = ({ onSelect, isExpanded, onClose, className }) => {
 			document.removeEventListener("mousedown", handleClickOutside);
 	}, [onClose]);
 
-	const handleSearch = async (e) => {
-		const val = e.target.value;
-		setQuery(val);
+	// Debounced search effect
+	useEffect(() => {
+		// Clear previous timer
+		if (debounceTimerRef.current) {
+			clearTimeout(debounceTimerRef.current);
+		}
 
-		if (val.length > 1) {
-			setIsLoading(true);
+		// If query is too short, clear results
+		if (query.length <= 1) {
+			setResults([]);
+			setIsLoading(false);
+			return;
+		}
+
+		// Set loading state
+		setIsLoading(true);
+
+		// Debounce the API call - wait 500ms after user stops typing
+		debounceTimerRef.current = setTimeout(async () => {
 			try {
-				const stocks = await searchStocksfromExternalAPI(val);
+				const stocks = await searchStocksfromExternalAPI(query);
 				setResults(stocks);
 			} catch (error) {
 				console.error("Search failed:", error);
+				setResults([]);
 			} finally {
 				setIsLoading(false);
 			}
-		} else {
-			setResults([]);
-		}
+		}, 500); // 500ms delay
+
+		// Cleanup function
+		return () => {
+			if (debounceTimerRef.current) {
+				clearTimeout(debounceTimerRef.current);
+			}
+		};
+	}, [query]);
+
+	const handleSearch = (e) => {
+		const val = e.target.value;
+		setQuery(val);
 	};
 
 	const handleClear = () => {
@@ -105,39 +130,35 @@ const StockSearchBar = ({ onSelect, isExpanded, onClose, className }) => {
 
 			{results.length > 0 && (
 				<div
-					className="absolute top-full left-0 right-0 mt-1 bg-[var(--secondary-100)] dark:bg-[var(--background-200)] scrollable-content rounded-lg shadow-lg border-1
-					border-[var(--secondary-200)] dark:border-[var(--secondary-300)] max-h-60 overflow-y-auto z-50 font-semibold p-1 "
+					className="absolute top-full left-0 right-0 mt-1 bg-[var(--secondary-100)] dark:bg-[var(--background-200)] scrollable-content rounded-lg shadow-lg border border-[var(--secondary-200)] dark:border-[var(--secondary-300)] max-h-48 sm:max-h-60 overflow-y-auto z-50 font-semibold p-1"
 				>
 					{results.map((stock) => (
 						<button
 							key={stock.symbol}
 							onClick={() => handleSelect(stock)}
-							className="w-full px-4 py-2 text-left hover:bg-[var(--secondary-100)] dark:hover:bg-[var(--background-300)] flex items-center justify-between"
+							className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-left hover:bg-[var(--secondary-100)] dark:hover:bg-[var(--background-300)] flex items-center justify-between gap-2"
 						>
-							<div>
-								<div className="font-medium text-[var(--text-950)] dark:text-[var(--text-50)]">
+							<div className="flex-1 min-w-0">
+								<div className="font-medium text-sm sm:text-base text-[var(--text-950)] dark:text-[var(--text-50)] truncate">
 									{stock.symbol}
 								</div>
-								<div className="text-sm text-[var(--text-600)] dark:text-[var(--text-300)]">
+								<div className="text-xs sm:text-sm text-[var(--text-600)] dark:text-[var(--text-300)] truncate">
 									{stock.shortname}
 								</div>
 							</div>
-							<div className="flex items-center h-full">
-								<div className="text-xs bg-[var(--secondary-200)] dark:bg-[var(--background-300)] text-purple-600 dark:text-purple-400 px-2 py-1 rounded">
+							<div className="flex items-center gap-2 flex-shrink-0">
+								<div className="hidden sm:block text-xs bg-[var(--secondary-200)] dark:bg-[var(--background-300)] text-purple-600 dark:text-purple-400 px-2 py-1 rounded">
 									{stock.type || "Stock"}
 								</div>
-								<div className="ml-2 flex items-center">
-									<div
-										className="text-[var(--secondary-400)] hover:text-[var(--secondary-500)] dark:text-[var(--text-400)] dark:hover:text-[var(--text-300)]"
-										onClick={(e) => {
-											e.preventDefault();
-											e.stopPropagation();	
-											handleAddstock(stock)
-										}}
-										
-									>
-										<PlusSquare className="h-5 w-5 text-[var(--secondary-400)] dark:text-[var(--text-400)]" />
-									</div>
+								<div
+									className="text-[var(--secondary-400)] hover:text-[var(--secondary-500)] dark:text-[var(--text-400)] dark:hover:text-[var(--text-300)] cursor-pointer"
+									onClick={(e) => {
+										e.preventDefault();
+										e.stopPropagation();	
+										handleAddstock(stock)
+									}}
+								>
+									<PlusSquare className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--secondary-400)] dark:text-[var(--text-400)]" />
 								</div>
 							</div>
 						</button>

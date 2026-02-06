@@ -58,19 +58,19 @@ const Watchlist = ({ loading, showBackButton = false }) => {
 				) : (
 					<div className="p-6">
 						{/* Header */}
-						<div className="flex items-center justify-between mb-6">
-							<div>
-								<h2 className="text-2xl font-bold text-[var(--text-900)] dark:text-[var(--text-50)]">
+						<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+							<div className="flex-1 min-w-0">
+								<h2 className="text-xl sm:text-2xl font-bold text-[var(--text-900)] dark:text-[var(--text-50)]">
 									Your Watchlists
 								</h2>
-								<p className="text-[var(--text-600)] dark:text-[var(--text-400)] mt-1">
+								<p className="text-sm sm:text-base text-[var(--text-600)] dark:text-[var(--text-400)] mt-1">
 									{watchlists.length} watchlist{watchlists.length !== 1 ? 's' : ''} • Manage your stock portfolios
 								</p>
 							</div>
 						</div>
 
 						{/* Watchlist Grid */}
-						<div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-h-[60vh] overflow-y-auto scrollable-content">
+						<div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-h-[50vh] sm:max-h-[60vh] overflow-y-auto scrollable-content">
 							{watchlists.map((watchlist) => (
 								<div key={watchlist._id} className="transition-transform duration-200 hover:scale-[1.02]">
 									<WatchlistCard watchlist={watchlist} />
