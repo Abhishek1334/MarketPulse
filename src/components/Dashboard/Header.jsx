@@ -34,14 +34,13 @@ const Header = () => {
 	);
 
 	return (
-		<div className=" bg-[var(--background-100)] text-[var(--text-950)] p-15  shadow-md rounded-lg flex flex-col justify-evenly transition-all duration-500 ease-in-out max-md:p-6">
-			<h1 className="text-2xl font-bold mb-4 text-[var(--text-950)] dark:text-[var(--text-50)] ">
-				{" "}
+		<div className="bg-[var(--background-100)] text-[var(--text-950)] p-4 sm:p-6 md:p-8 shadow-md rounded-lg flex flex-col justify-evenly transition-all duration-500 ease-in-out h-full">
+			<h1 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-[var(--text-950)] dark:text-[var(--text-50)] break-words">
 				{getGreeting()}, {user.name.split(" ")[0]}!
 			</h1>
-			<div className="text-md font-Nunito max-sm:text-sm text-[var(--text-700)] dark:text-[var(--text-300)] ">
+			<div className="text-sm sm:text-base font-Nunito text-[var(--text-700)] dark:text-[var(--text-300)] break-words">
 				<p>
-					<span className="font-semibold">Email:</span> {user.email}
+					<span className="font-semibold">Email:</span> <span className="break-all">{user.email}</span>
 				</p>
 			</div>
 		</div>

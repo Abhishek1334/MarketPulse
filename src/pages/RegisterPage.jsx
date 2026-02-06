@@ -135,53 +135,54 @@ const RegisterPage = () => {
 	const passwordStrength = getPasswordStrength(formData.password);
 
 	return (
-		<div ref={registerRef} className="min-h-screen bg-gradient-to-br from-[var(--background-50)] via-[var(--background-100)] to-[var(--background-200)] flex items-center justify-center px-4 py-12 relative overflow-hidden">
+		<div ref={registerRef} className="min-h-screen bg-gradient-to-br from-[var(--background-50)] via-[var(--background-100)] to-[var(--background-200)] flex items-center justify-center px-2 sm:px-4 py-4 sm:py-6 md:py-12 relative overflow-hidden">
 			{/* Background Decorations */}
 			<div className="absolute inset-0 overflow-hidden pointer-events-none">
-				<div className="bg-decoration absolute top-1/4 left-1/4 w-64 h-64 bg-[var(--primary-500)]/10 rounded-full mix-blend-multiply filter blur-xl"></div>
-				<div className="bg-decoration absolute top-3/4 right-1/4 w-64 h-64 bg-[var(--accent-500)]/10 rounded-full mix-blend-multiply filter blur-xl"></div>
-				<div className="bg-decoration absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[var(--secondary-500)]/5 rounded-full mix-blend-multiply filter blur-2xl"></div>
+				<div className="bg-decoration absolute top-1/4 left-1/4 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-[var(--primary-500)]/10 rounded-full mix-blend-multiply filter blur-xl"></div>
+				<div className="bg-decoration absolute top-3/4 right-1/4 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-[var(--accent-500)]/10 rounded-full mix-blend-multiply filter blur-xl"></div>
+				<div className="bg-decoration absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 sm:w-72 sm:h-72 md:w-96 md:h-96 bg-[var(--secondary-500)]/5 rounded-full mix-blend-multiply filter blur-2xl"></div>
 			</div>
 
 			{/* Main Content */}
 			<div className="w-full max-w-md relative z-10">
 				{/* Header Badge */}
-				<div className="form-element text-center mb-8">
-					<Badge variant="outline" className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--background-100)]/80 backdrop-blur-sm border-[var(--primary-500)]/20">
-						<Sparkles className="w-4 h-4 text-[var(--primary-500)]" />
-						Join MarketPulse Today
+				<div className="form-element text-center mb-4 sm:mb-6 md:mb-8">
+					<Badge variant="outline" className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 bg-[var(--background-100)]/80 backdrop-blur-sm border-[var(--primary-500)]/20 text-xs sm:text-sm">
+						<Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--primary-500)]" />
+						<span className="hidden xs:inline">Join MarketPulse Today</span>
+						<span className="xs:hidden">Join Today</span>
 					</Badge>
 				</div>
 
 				{/* Register Card */}
 				<Card className="register-card bg-[var(--background-100)]/95 backdrop-blur-lg border-[var(--background-300)] shadow-2xl">
-					<CardHeader className="text-center space-y-4 pb-8">
+					<CardHeader className="text-center space-y-2 sm:space-y-3 md:space-y-4 pb-4 sm:pb-6 md:pb-8 px-3 sm:px-6">
 						<div className="form-element flex justify-center">
 							<div className="relative">
-								<Icon iconSize="16" iconColor="light" className="hover:scale-110 transition-transform duration-300" />
-								<div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-[var(--primary-500)] to-[var(--accent-500)] rounded-full animate-pulse"></div>
+								<Icon iconSize="12" iconColor="light" className="h-10 w-10 sm:h-12 sm:w-12 md:h-16 md:w-16 hover:scale-110 transition-transform duration-300" />
+								<div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-[var(--primary-500)] to-[var(--accent-500)] rounded-full animate-pulse"></div>
 							</div>
 						</div>
-						<div className="form-element space-y-2">
-							<CardTitle className="text-3xl font-bold text-[var(--text-950)] dark:text-[var(--text-50)]">
+						<div className="form-element space-y-1 sm:space-y-2">
+							<CardTitle className="text-2xl sm:text-3xl font-bold text-[var(--text-950)] dark:text-[var(--text-50)]">
 								Create Account
 							</CardTitle>
-							<CardDescription className="text-[var(--text-600)] dark:text-[var(--text-300)] text-lg">
+							<CardDescription className="text-sm sm:text-base md:text-lg text-[var(--text-600)] dark:text-[var(--text-300)]">
 								Start your investment journey with us
 							</CardDescription>
 						</div>
 					</CardHeader>
 
-					<CardContent className="space-y-6">
-						<form onSubmit={handleSubmit} className="space-y-6">
+					<CardContent className="space-y-4 sm:space-y-5 md:space-y-6 px-3 sm:px-6">
+						<form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 md:space-y-6">
 							{/* Name Field */}
-							<div className="form-element space-y-2">
-								<label className="text-sm font-medium text-[var(--text-700)] dark:text-[var(--text-50)]">
+							<div className="form-element space-y-1.5 sm:space-y-2">
+								<label className="text-xs sm:text-sm font-medium text-[var(--text-700)] dark:text-[var(--text-50)]">
 									Full Name
 								</label>
 								<div className="relative">
-									<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-										<User className="h-5 w-5 text-[var(--text-400)]" />
+									<div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+										<User className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--text-400)]" />
 									</div>
 					<input
 						type="text"
@@ -189,7 +190,7 @@ const RegisterPage = () => {
 										value={formData.name}
 										placeholder="Enter your full name"
 						onChange={handleChange}
-										className="w-full pl-10 pr-4 py-3 bg-[var(--background-200)] border border-[var(--background-300)] rounded-lg text-[var(--text-950)] dark:text-[var(--text-50)] placeholder-[var(--text-500)] dark:placeholder-[var(--text-300)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent transition-all duration-200"
+										className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 md:py-3 bg-[var(--background-200)] border border-[var(--background-300)] rounded-lg text-sm sm:text-base text-[var(--text-950)] dark:text-[var(--text-50)] placeholder-[var(--text-500)] dark:placeholder-[var(--text-300)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent transition-all duration-200"
 						required
 						autoComplete="name"
 					/>
@@ -197,13 +198,13 @@ const RegisterPage = () => {
 							</div>
 
 							{/* Email Field */}
-							<div className="form-element space-y-2">
-								<label className="text-sm font-medium text-[var(--text-700)] dark:text-[var(--text-50)]">
+							<div className="form-element space-y-1.5 sm:space-y-2">
+								<label className="text-xs sm:text-sm font-medium text-[var(--text-700)] dark:text-[var(--text-50)]">
 									Email Address
 								</label>
 								<div className="relative">
-									<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-										<Mail className="h-5 w-5 text-[var(--text-400)]" />
+									<div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+										<Mail className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--text-400)]" />
 									</div>
 					<input
 						type="email"
@@ -211,7 +212,7 @@ const RegisterPage = () => {
 										value={formData.email}
 										placeholder="Enter your email"
 						onChange={handleChange}
-										className="w-full pl-10 pr-4 py-3 bg-[var(--background-200)] border border-[var(--background-300)] rounded-lg text-[var(--text-950)] dark:text-[var(--text-50)] placeholder-[var(--text-500)] dark:placeholder-[var(--text-300)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent transition-all duration-200"
+										className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 md:py-3 bg-[var(--background-200)] border border-[var(--background-300)] rounded-lg text-sm sm:text-base text-[var(--text-950)] dark:text-[var(--text-50)] placeholder-[var(--text-500)] dark:placeholder-[var(--text-300)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent transition-all duration-200"
 						required
 						autoComplete="email"
 					/>
@@ -219,13 +220,13 @@ const RegisterPage = () => {
 							</div>
 
 							{/* Password Field */}
-							<div className="form-element space-y-2">
-								<label className="text-sm font-medium text-[var(--text-700)] dark:text-[var(--text-50)]">
+							<div className="form-element space-y-1.5 sm:space-y-2">
+								<label className="text-xs sm:text-sm font-medium text-[var(--text-700)] dark:text-[var(--text-50)]">
 									Password
 								</label>
 					<div className="relative">
-									<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-										<Lock className="h-5 w-5 text-[var(--text-400)]" />
+									<div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+										<Lock className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--text-400)]" />
 									</div>
 						<input
 							type={showPassword ? "text" : "password"}
@@ -233,35 +234,35 @@ const RegisterPage = () => {
 										value={formData.password}
 										placeholder="Create a password"
 							onChange={handleChange}
-										className="w-full pl-10 pr-12 py-3 bg-[var(--background-200)] border border-[var(--background-300)] rounded-lg text-[var(--text-950)] dark:text-[var(--text-50)] placeholder-[var(--text-500)] dark:placeholder-[var(--text-300)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent transition-all duration-200"
+										className="w-full pl-8 sm:pl-10 pr-10 sm:pr-12 py-2 sm:py-2.5 md:py-3 bg-[var(--background-200)] border border-[var(--background-300)] rounded-lg text-sm sm:text-base text-[var(--text-950)] dark:text-[var(--text-50)] placeholder-[var(--text-500)] dark:placeholder-[var(--text-300)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent transition-all duration-200"
 							required
 										autoComplete="new-password"
 						/>
 									<button
 										type="button"
 										onClick={() => setShowPassword(!showPassword)}
-										className="absolute inset-y-0 right-0 pr-3 flex items-center text-[var(--text-400)] hover:text-[var(--text-600)] transition-colors duration-200"
+										className="absolute inset-y-0 right-0 pr-2 sm:pr-3 flex items-center text-[var(--text-400)] hover:text-[var(--text-600)] transition-colors duration-200"
 									>
 							{showPassword ? (
-											<EyeOff className="h-5 w-5" />
+											<EyeOff className="h-4 w-4 sm:h-5 sm:w-5" />
 										) : (
-											<Eye className="h-5 w-5" />
+											<Eye className="h-4 w-4 sm:h-5 sm:w-5" />
 										)}
 									</button>
 								</div>
 								
 								{/* Password Strength Indicator */}
 								{formData.password && (
-									<div className="space-y-2">
+									<div className="space-y-1.5 sm:space-y-2">
 										<div className="flex items-center justify-between text-xs">
 											<span className="text-[var(--text-600)]">Password strength:</span>
 											<span className={`font-medium ${passwordStrength.color}`}>
 												{passwordStrength.text}
 											</span>
 										</div>
-										<div className="w-full bg-[var(--background-300)] rounded-full h-2">
+										<div className="w-full bg-[var(--background-300)] rounded-full h-1.5 sm:h-2">
 											<div 
-												className={`h-2 rounded-full transition-all duration-300 ${
+												className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
 													passwordStrength.strength === 100 ? 'bg-green-500' :
 													passwordStrength.strength >= 75 ? 'bg-blue-500' :
 													passwordStrength.strength >= 50 ? 'bg-yellow-500' : 'bg-red-500'
@@ -274,13 +275,13 @@ const RegisterPage = () => {
 							</div>
 
 							{/* Confirm Password Field */}
-							<div className="form-element space-y-2">
-								<label className="text-sm font-medium text-[var(--text-700)] dark:text-[var(--text-50)]">
+							<div className="form-element space-y-1.5 sm:space-y-2">
+								<label className="text-xs sm:text-sm font-medium text-[var(--text-700)] dark:text-[var(--text-50)]">
 									Confirm Password
 								</label>
 								<div className="relative">
-									<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-										<Lock className="h-5 w-5 text-[var(--text-400)]" />
+									<div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+										<Lock className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--text-400)]" />
 									</div>
 									<input
 										type={showConfirmPassword ? "text" : "password"}
@@ -288,37 +289,37 @@ const RegisterPage = () => {
 										value={formData.confirmPassword}
 										placeholder="Confirm your password"
 										onChange={handleChange}
-										className="w-full pl-10 pr-12 py-3 bg-[var(--background-200)] border border-[var(--background-300)] rounded-lg text-[var(--text-950)] dark:text-[var(--text-50)] placeholder-[var(--text-500)] dark:placeholder-[var(--text-300)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent transition-all duration-200"
+										className="w-full pl-8 sm:pl-10 pr-10 sm:pr-12 py-2 sm:py-2.5 md:py-3 bg-[var(--background-200)] border border-[var(--background-300)] rounded-lg text-sm sm:text-base text-[var(--text-950)] dark:text-[var(--text-50)] placeholder-[var(--text-500)] dark:placeholder-[var(--text-300)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent transition-all duration-200"
 										required
 										autoComplete="new-password"
 									/>
 									<button
 										type="button"
 										onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-										className="absolute inset-y-0 right-0 pr-3 flex items-center text-[var(--text-400)] hover:text-[var(--text-600)] transition-colors duration-200"
+										className="absolute inset-y-0 right-0 pr-2 sm:pr-3 flex items-center text-[var(--text-400)] hover:text-[var(--text-600)] transition-colors duration-200"
 									>
 										{showConfirmPassword ? (
-											<EyeOff className="h-5 w-5" />
+											<EyeOff className="h-4 w-4 sm:h-5 sm:w-5" />
 										) : (
-											<Eye className="h-5 w-5" />
+											<Eye className="h-4 w-4 sm:h-5 sm:w-5" />
 										)}
 									</button>
 								</div>
 								
 								{/* Password Match Indicator */}
 								{formData.confirmPassword && (
-									<div className={`flex items-center gap-2 text-xs ${
+									<div className={`flex items-center gap-1.5 sm:gap-2 text-xs ${
 										formData.password === formData.confirmPassword ? 'text-green-600' : 'text-red-600'
 									}`}>
 										{formData.password === formData.confirmPassword ? (
 											<>
-												<CheckCircle className="w-3 h-3" />
-												Passwords match
+												<CheckCircle className="w-3 h-3 flex-shrink-0" />
+												<span>Passwords match</span>
 											</>
 										) : (
 											<>
-												<X className="w-3 h-3" />
-												Passwords don't match
+												<X className="w-3 h-3 flex-shrink-0" />
+												<span>Passwords don't match</span>
 											</>
 							)}
 						</div>
@@ -329,24 +330,26 @@ const RegisterPage = () => {
 							<Button
 								type="submit"
 								disabled={isLoading}
-								className="form-element w-full bg-gradient-to-r from-[var(--primary-600)] to-[var(--accent-600)] hover:from-[var(--primary-700)] hover:to-[var(--accent-700)] text-white dark:text-[var(--text-50)] font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+								className="form-element w-full bg-gradient-to-r from-[var(--primary-600)] to-[var(--accent-600)] hover:from-[var(--primary-700)] hover:to-[var(--accent-700)] text-white dark:text-[var(--text-50)] font-semibold px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-sm sm:text-base"
 							>
 						{isLoading ? (
-									<div className="flex items-center justify-center gap-2">
-										<div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-										Creating Account...
+									<div className="flex items-center justify-center gap-1.5 sm:gap-2">
+										<div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+										<span className="hidden xs:inline">Creating Account...</span>
+										<span className="xs:hidden">Loading...</span>
 							</div>
 						) : (
-									<div className="flex items-center justify-center gap-2">
-										Create Account
-										<ArrowRight className="w-5 h-5" />
+									<div className="flex items-center justify-center gap-1.5 sm:gap-2">
+										<span className="hidden xs:inline">Create Account</span>
+										<span className="xs:hidden">Create</span>
+										<ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
 									</div>
 						)}
 							</Button>
 				</form>
 
 						{/* Terms */}
-						<div className="form-element text-center text-xs text-[var(--text-500)]">
+						<div className="form-element text-center text-[10px] sm:text-xs text-[var(--text-500)] leading-relaxed px-2">
 							By creating an account, you agree to our{" "}
 							<a href="#" className="text-[var(--primary-600)] hover:underline">Terms of Service</a>{" "}
 							and{" "}
@@ -358,8 +361,8 @@ const RegisterPage = () => {
 							<div className="absolute inset-0 flex items-center">
 								<div className="w-full border-t border-[var(--background-300)]"></div>
 							</div>
-							<div className="relative flex justify-center text-sm">
-								<span className="px-4 bg-[var(--background-100)] text-[var(--text-500)]">
+							<div className="relative flex justify-center text-xs sm:text-sm">
+								<span className="px-2 sm:px-4 bg-[var(--background-100)] text-[var(--text-500)]">
 									Already have an account?
 								</span>
 							</div>
@@ -368,18 +371,19 @@ const RegisterPage = () => {
 						{/* Login Link */}
 						<div className="form-element text-center">
 							<Link to="/login">
-								<Button variant="ghost" className="w-full hover:bg-[var(--background-200)] transition-colors duration-200">
-									Sign in to your account
-									<ArrowRight className="w-4 h-4 ml-2" />
+								<Button variant="ghost" className="w-full hover:bg-[var(--background-200)] transition-colors duration-200 text-sm sm:text-base py-2 sm:py-2.5">
+									<span className="hidden xs:inline">Sign in to your account</span>
+									<span className="xs:hidden">Sign in</span>
+									<ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
 								</Button>
 							</Link>
 						</div>
 
 						{/* Back to Home */}
-						<div className="form-element text-center pt-4">
+						<div className="form-element text-center pt-2 sm:pt-4">
 					<Link
 								to="/"
-								className="text-sm text-[var(--text-500)] hover:text-[var(--text-700)] transition-colors duration-200"
+								className="text-xs sm:text-sm text-[var(--text-500)] hover:text-[var(--text-700)] transition-colors duration-200"
 					>
 								← Back to homepage
 					</Link>

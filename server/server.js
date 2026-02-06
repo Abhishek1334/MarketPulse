@@ -43,6 +43,7 @@ const mongoURI = process.env.MONGO_URI;
 // DB connection
 const connectDB = async () => {
 	try {
+
 		await mongoose.connect(mongoURI);
 		console.log("✅ MongoDB Connected Successfully!!");
 

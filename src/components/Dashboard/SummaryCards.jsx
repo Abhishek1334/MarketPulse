@@ -12,14 +12,14 @@ const SummaryCards = ({ loading }) => {
 		: 0;
 
 	return (
-		<div className="flex flex-row md:grid-cols-2 gap-6">
-			<div className="summaryCard">
-				<span className="font-Nunito text-2xl max-md:text-lg font-bold max-md:font-semibold">
+		<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+			<div className="summaryCard p-4 sm:p-6">
+				<span className="font-Nunito text-lg sm:text-xl md:text-2xl font-bold block mb-2 sm:mb-3">
 					Total Watchlists
 				</span>
-				<div className="text-3xl max-md:text-lg font-semibold place-self-end">
+				<div className="text-2xl sm:text-3xl md:text-4xl font-semibold">
 					{loading ? (
-						<div className="flex items-center pt-4 max-sm:items-center">
+						<div className="flex items-center pt-2 sm:pt-4">
 							<div className="loader"></div>
 						</div>
 					) : (
@@ -27,13 +27,13 @@ const SummaryCards = ({ loading }) => {
 					)}
 				</div>
 			</div>
-			<div className="summaryCard">
-				<span className="font-Nunito text-2xl max-md:text-lg font-bold max-md:font-semibold">
+			<div className="summaryCard p-4 sm:p-6">
+				<span className="font-Nunito text-lg sm:text-xl md:text-2xl font-bold block mb-2 sm:mb-3">
 					Total Stocks Tracked
 				</span>
-				<div className="text-3xl max-md:text-lg font-semibold place-self-end">
+				<div className="text-2xl sm:text-3xl md:text-4xl font-semibold">
 					{loading ? (
-						<div className="flex items-center pt-4 max-sm:items-center">
+						<div className="flex items-center pt-2 sm:pt-4">
 							<div className="loader"></div>
 						</div>
 					) : (
