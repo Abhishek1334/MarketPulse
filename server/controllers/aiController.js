@@ -175,7 +175,7 @@ export const chatHandler = async (req, res, next) => {
 		const result = streamText({
 			model: google("gemini-2.5-flash"),
 			system: SYSTEM_PROMPT,
-			messages: convertToModelMessages(messages),
+			messages: await convertToModelMessages(messages),
 			tools,
 			stopWhen: stepCountIs(5),
 		});

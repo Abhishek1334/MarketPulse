@@ -72,25 +72,25 @@ const ChartSection = () => {
 
 	const values = stockData.map((entry) => entry[selectedMetric]);
 
-	// Dynamic colors based on theme
+	// Dynamic colors based on theme — match new amber accent token
 	const getChartColors = () => {
 		if (isDarkMode) {
 			return {
-				borderColor: "rgb(192, 132, 252)", // --primary-400
-				backgroundColor: "rgba(192, 132, 252, 0.1)",
-				pointBackgroundColor: "rgb(192, 132, 252)",
-				pointHoverBackgroundColor: "rgb(168, 85, 247)", // --primary-500
-				pointBorderColor: "#1e2128", // --background-200
-				pointHoverBorderColor: "#242831", // --background-300
+				borderColor: "oklch(76% 0.16 60)",
+				backgroundColor: "oklch(76% 0.16 60 / 0.12)",
+				pointBackgroundColor: "oklch(76% 0.16 60)",
+				pointHoverBackgroundColor: "oklch(82% 0.15 60)",
+				pointBorderColor: "oklch(18% 0.012 250)",
+				pointHoverBorderColor: "oklch(22% 0.013 250)",
 			};
 		}
 		return {
-			borderColor: "rgb(168, 85, 247)", // --primary-500
-			backgroundColor: "rgba(168, 85, 247, 0.1)",
-			pointBackgroundColor: "rgb(168, 85, 247)",
-			pointHoverBackgroundColor: "rgb(147, 51, 234)", // --primary-600
-			pointBorderColor: "#ffffff",
-			pointHoverBorderColor: "#ffffff",
+			borderColor: "oklch(64% 0.16 60)",
+			backgroundColor: "oklch(72% 0.16 60 / 0.12)",
+			pointBackgroundColor: "oklch(64% 0.16 60)",
+			pointHoverBackgroundColor: "oklch(56% 0.15 60)",
+			pointBorderColor: "oklch(98% 0.005 60)",
+			pointHoverBorderColor: "oklch(98% 0.005 60)",
 		};
 	};
 
