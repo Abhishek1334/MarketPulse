@@ -118,7 +118,7 @@ const useStore = create(
 
 			// Portfolio Actions
 			addHolding: async (holding) => {
-				const data = await apiAddHolding({
+				await apiAddHolding({
 					symbol: holding.symbol,
 					shares: holding.shares,
 					averagePrice: holding.averagePrice,
@@ -126,46 +126,25 @@ const useStore = create(
 					notes: holding.notes,
 					sector: holding.sector,
 				});
-				set((state) => ({
-					portfolio: {
-						...state.portfolio,
-						holdings: normalizeHoldings(data.holdings),
-						transactions: normalizeTransactions(data.transactions),
-					},
-				}));
-				get().calculatePortfolioMetrics();
+				// Refetch through loadPortfolio so the new holding gets a current
+				// price merged in. Using the API response directly leaves
+				// currentPrice undefined and the totals fall back to averagePrice.
+				await get().loadPortfolio();
 			},
 
 			updateHolding: async (holdingId, updates) => {
-				const data = await apiUpdateHolding(holdingId, updates);
-				set((state) => ({
-					portfolio: {
-						...state.portfolio,
-						holdings: normalizeHoldings(data.holdings),
-					},
-				}));
-				get().calculatePortfolioMetrics();
+				await apiUpdateHolding(holdingId, updates);
+				await get().loadPortfolio();
 			},
 
 			removeHolding: async (holdingId) => {
-				const data = await apiDeleteHolding(holdingId);
-				set((state) => ({
-					portfolio: {
-						...state.portfolio,
-						holdings: normalizeHoldings(data.holdings),
-					},
-				}));
-				get().calculatePortfolioMetrics();
+				await apiDeleteHolding(holdingId);
+				await get().loadPortfolio();
 			},
 
 			addTransaction: async (transaction) => {
-				const data = await apiAddTransaction(transaction);
-				set((state) => ({
-					portfolio: {
-						...state.portfolio,
-						transactions: normalizeTransactions(data.transactions),
-					},
-				}));
+				await apiAddTransaction(transaction);
+				await get().loadPortfolio();
 			},
 
 			updatePortfolioPerformance: (performance) =>
