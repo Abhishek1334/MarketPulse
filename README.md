@@ -1,11 +1,11 @@
 # MarketPulse
 
-A stock market analytics SPA: watchlists, portfolio tracking, interactive price charts, technical indicators, and AI-powered insights.
+A focused stock-tracking SPA: watchlists, portfolio with real prices, interactive charts, and an AI assistant grounded in your actual data.
 
 **Live:** https://market-pulse-two.vercel.app/
 **Source:** https://github.com/Abhishek1334/MarketPulse
 
-> Built as a portfolio piece to practice fullstack development end-to-end: auth, third-party API integration, charting, state management, and deployment across two platforms.
+> Built as a portfolio piece. The goal was to ship a real fullstack app end-to-end — auth, third-party API integration, charting, state management, AI tool-calling, and single-platform deployment — and to keep every claim in this README honest.
 
 ---
 
@@ -14,25 +14,28 @@ A stock market analytics SPA: watchlists, portfolio tracking, interactive price 
 | Layer | Choice | Why |
 | --- | --- | --- |
 | Frontend | React 19, Vite 6, Tailwind v4 | Fast dev loop, modern build, utility-first styling |
-| State | Zustand (auth/UI) + TanStack Query (server data) | Clear split between client state and server cache |
+| State | Zustand (auth, theme, portfolio cache) + TanStack Query (watchlists) | Clear split between client state and server cache |
 | Charts | Chart.js + react-chartjs-2 | Light footprint vs. heavier alternatives |
 | UI primitives | shadcn/ui (Radix + cva), lucide-react icons | Accessible, copy-paste, no runtime dep on a UI lib |
-| Animations | GSAP + ScrollTrigger | Smooth scroll-driven entrances |
-| Backend | Express 5, Mongoose, MongoDB Atlas | Familiar Node stack, fast iteration |
+| Animation | GSAP for hero reveals, native CSS for everything else | One signature entrance, restrained micro-interactions |
+| Typography | Fraunces (serif display), Plus Jakarta Sans (body), JetBrains Mono (numbers) | Editorial finance section feel; tabular numerals on prices |
+| Backend | Express 5, Mongoose, MongoDB Atlas (cached connection) | Familiar Node stack, fast iteration |
 | Auth | JWT (Bearer in `Authorization` header) | Simple, works without sessions |
 | Market data | Twelve Data (search, quote, time-series) | Single provider after migrating off Yahoo Finance |
 | AI | Vercel AI SDK v6 + Google Gemini 2.5 Flash (free tier) | Tool-call-driven assistant, streaming via `pipeUIMessageStreamToResponse` |
-| Hosting | **Vercel** (single deploy: frontend + Express as a Function) | Single platform, sub-second cold start via Fluid Compute, free Hobby plan |
+| Hosting | **Vercel** — single deploy, frontend + Express together as one Function | Sub-second cold start via Fluid Compute, free Hobby plan |
+
+---
 
 ## Features
 
-- **Watchlists** — multiple per user, add/remove stocks, live quotes.
-- **Portfolio tracking** — holdings + transactions persisted to MongoDB. Real-time current prices fetched on load.
-- **Stock analytics** — interactive Chart.js price charts with technical indicators (RSI, MACD, SMA, EMA), timeframe + interval picker.
+- **Watchlists** — multiple per user, add/remove stocks, server-cached quotes.
+- **Portfolio** — holdings + transactions persisted to MongoDB. Real current prices fetched on every load and after every mutation.
+- **Stock analytics** — interactive Chart.js price charts with technical indicators (RSI, MACD, SMA, EMA, Bollinger), timeframe + interval picker.
 - **Symbol search** — Twelve Data search debounced through a server-cached endpoint.
-- **AI Assistant** (`/assistant`) — natural-language Q&A about your portfolio and any stock. Tool-calling agent fetches live data through three tools: `getPortfolioSummary`, `getStockQuote`, `searchSymbol`. Streams responses via Server-Sent Events.
-- **Light + dark mode** — fully themed via CSS variables.
-- **Server-side response cache** — namespace-scoped TTL cache (60s for quotes, 5min for charts, 1h for search/validate) extends the free-tier API quota during demos. Cache stats exposed at `/api/stock/_cache-stats`.
+- **AI assistant** (`/assistant`) — natural-language Q&A about your portfolio and any stock. Tool-calling agent with three tools: `getPortfolioSummary`, `getStockQuote`, `searchSymbol`. Streams responses via Server-Sent Events. Tool calls are visible in the UI ("🔧 Used: getStockQuote") so users can audit what the agent did.
+- **Light + dark mode** — themed via OKLCH CSS variables. Brand accent unified across modes.
+- **Server-side response cache** — namespace-scoped TTL cache (60s for quotes, 5min for charts, 1h for search/validate) extends the free-tier API quota during demos. Hit-rate exposed at `/api/stock/_cache-stats`.
 
 ---
 
@@ -69,23 +72,27 @@ A stock market analytics SPA: watchlists, portfolio tracking, interactive price 
 
 ## Notable design decisions
 
-**API proxy, not direct calls.** All Twelve Data requests go through Express. The API key stays server-side. Client never sees it. (The downside: every quote lookup costs you a server roundtrip, so we cache aggressively.)
+**API proxy, not direct calls.** All Twelve Data requests go through Express. The API key stays server-side. Client never sees it. The downside: every quote lookup costs a server roundtrip, so we cache aggressively.
 
-**Hybrid state model.** Zustand for things the client owns (auth, UI). TanStack Query for things the server owns (watchlists). Portfolio uses Zustand-as-cache + explicit `loadPortfolio()` actions that call the API — pragmatic, but a future cleanup would move it fully into TanStack Query.
+**Hybrid state model.** Zustand for things the client owns (auth, UI, portfolio cache). TanStack Query for things the server owns (watchlists). Portfolio actions are async API calls that re-trigger `loadPortfolio` afterward to keep the cache in sync with current quotes.
 
 **Embedded subdocuments.** Holdings and transactions live as subdoc arrays inside one `Portfolio` doc per user, mirroring the watchlist+stocks shape. Trade-off: simpler reads, harder atomic updates at scale. Fine for the use case.
 
-**Client-side rate limiter for chart fetches.** A `useRateLimitedFetch` hook batches and dedupes chart requests with a 5-minute TTL cache. It does *not* protect the actual API quota — that's the server's job — but it dramatically reduces redundant requests when a user toggles intervals.
+**Single-Function backend.** `api/index.js` exports the Express app and the `vercel.json` rewrite forwards every `/api/*` request through with the path preserved in a query parameter. The function reconstructs `req.url` before invoking the app, so Express routing works unchanged. This pattern works on any Vercel framework preset; the typical `[...slug]` catch-all convention is Next.js-only and silently drops requests on Vite projects.
+
+**Mongoose connection caching.** `server/db.js` caches the connection on `globalThis._mongooseCache` so warm Function invocations reuse it instead of opening a new connection each request. Without this, Atlas blocks the deployment within minutes.
+
+**Editorial design language.** Brand color is amber (`oklch(72% 0.16 60)`) shared across light and dark — the original code had it shifting from sky-blue to purple between modes, which read as two products. Display type is Fraunces (variable serif), body is Plus Jakarta Sans, numbers are JetBrains Mono with tabular numerals. The Homepage is laid out as a magazine spread (asymmetric 7/12 + 5/12 columns, oversized section numerals, marginalia labels) instead of the centered SaaS landing template that ships with most starter kits.
 
 ---
 
 ## Trade-offs and known limits
 
 - **JWT in localStorage.** Simple, but XSS-readable. A production version would use httpOnly cookies.
-- **Two hosts.** Frontend on Vercel, backend on Railway. Two CI pipelines, two cold starts. A future cut would consolidate to Vercel Functions.
-- **No tests yet.** Build/lint pass on PR; runtime behavior is verified manually.
-- **No real-time prices.** Quotes refresh on user action, not via WebSocket.
-- **Bundle size.** ~344 KB gzipped — Chart.js + GSAP are the bulk.
+- **No tests yet.** Build + lint + server syntax check run on every PR via GitHub Actions, but runtime behavior is verified manually with Playwright.
+- **No real-time prices.** Quotes refresh on user action, not via WebSocket. The free Twelve Data tier doesn't include WS.
+- **Free-tier rate limits.** Twelve Data is 8 req/min on the free plan. The server-side cache extends this significantly during demos, but a sustained burst will return errors.
+- **Bundle size.** ~370 KB gzipped — Chart.js + GSAP + AI SDK are the bulk. Code-splitting `/assistant` and `/stocks/:symbol` would shave ~200 KB for cold first paint.
 
 ---
 
@@ -110,7 +117,7 @@ GOOGLE_GENERATIVE_AI_API_KEY=<from aistudio.google.com/app/apikey — free, opti
 PORT=5000
 ```
 
-> The AI Assistant uses Google Gemini 2.5 Flash, which has a permanently free tier on Google AI Studio (no card required). If `GOOGLE_GENERATIVE_AI_API_KEY` is missing, the `/assistant` page surfaces a "not configured" message instead of crashing.
+> The AI assistant uses Gemini 2.5 Flash, which has a permanent free tier on Google AI Studio (no card required). If `GOOGLE_GENERATIVE_AI_API_KEY` is missing, `/assistant` returns a graceful "not configured" message instead of crashing.
 
 Run dev (two terminals):
 
@@ -128,6 +135,8 @@ Build for production:
 npm run build
 ```
 
+---
+
 ## Deploy to Vercel (5 minutes, free)
 
 The repo is set up so the Express backend runs as a single Vercel Function alongside the static frontend.
@@ -137,47 +146,34 @@ The repo is set up so the Express backend runs as a single Vercel Function along
    - Framework preset: **Vite** (auto-detected).
    - Root directory: leave as repo root.
    - Build command, output directory: leave defaults.
-3. **Set environment variables** in the project settings → Environment Variables. Add for *Production + Preview + Development*:
+3. **Set environment variables** in Project Settings → Environment Variables for *Production + Preview + Development*:
    ```
    MONGO_URI                       (your MongoDB Atlas connection string)
    JWT_SECRET                      (any long random string)
    TWELVE_DATA_API_KEY             (free key from twelvedata.com)
    GOOGLE_GENERATIVE_AI_API_KEY    (free key from aistudio.google.com/app/apikey)
    ```
-4. **Click Deploy.** First build takes ~2 minutes.
+4. **MongoDB Atlas → Network Access → add `0.0.0.0/0`** so Vercel's dynamic IPs can connect.
+5. **Click Deploy.** First build takes ~2 minutes.
 
-That's it. Frontend and backend live on the same domain — no CORS config, no two-host coordination, no sleep.
+Frontend and backend live on the same domain. No CORS config, no two-host coordination, no sleep.
 
 ### How it's wired
-- `api/[...slug].js` is a Vercel Function (catch-all filename) that exports the Express app.
-- `vercel.json` sets `maxDuration: 60s` for the Function (covers AI streaming) and rewrites all non-`/api/*` paths to `index.html` for SPA routing.
-- `server/db.js` caches the Mongoose connection on `globalThis` so warm Function invocations reuse it instead of opening a new one each request.
-- `server/app.js` runs an Express middleware that awaits `connectDB()` before any handler — fast on warm starts, transparent on cold.
-
----
-
-## Screenshots
-
-### Light mode
-| Homepage | Dashboard | Analytics |
-| --- | --- | --- |
-| ![Homepage](./screenshots/Homepage_Light.png) | ![Dashboard](./screenshots/Dashboard_Light.png) | ![Analytics](./screenshots/Analytics1_Light.png) |
-
-### Dark mode
-| Homepage | Dashboard | Analytics |
-| --- | --- | --- |
-| ![Homepage](./screenshots/Homapage_Dark.png) | ![Dashboard](./screenshots/Dashboard_Dark.png) | ![Analytics](./screenshots/Analytics1_Dark.png) |
-
-Full screenshot set in [`/screenshots`](./screenshots).
+- `api/index.js` exports the Express app from `server/app.js` as a Vercel Function.
+- `vercel.json` rewrites every `/api/:path*` request to `/api?__path=:path*`. The handler reconstructs `req.url = "/api/" + __path` before invoking Express, so app routing works unchanged.
+- `vercel.json` rewrites every non-`/api` path to `/index.html` for SPA routing, with a path-to-regexp negative lookahead `((?!api).*)` to avoid eating API requests.
+- `server/db.js` caches the Mongoose connection on `globalThis._mongooseCache` so warm Function invocations reuse it.
+- `server/app.js` runs an Express middleware that awaits `connectDB()` before any handler — instant on warm starts, transparent on cold.
+- Function `maxDuration` is set to 60s in `vercel.json` to cover AI streaming responses.
 
 ---
 
 ## What I'd do differently next time
 
 - **TypeScript from day one.** Most defects in this repo were prop-shape or response-shape mismatches that TS would have caught.
-- **One backend host.** Cold-start coordination across Vercel + Railway adds latency and complexity.
-- **Tests as a first-class citizen.** Even a small Vitest + Playwright harness would have caught the API-argument-order bug class.
-- **Move the rate limiter server-side.** Client-side counters protect the user's UX, not the API quota — those are different problems.
+- **Tests as a first-class citizen.** Even a small Vitest + Playwright harness would have caught several API-argument-order and stale-state bugs that surfaced in late-stage testing.
+- **Code-split per route.** A 1.2 MB unsplit bundle is fine for an in-house tool, dragging on a public landing page.
+- **Real-time prices via WebSocket.** Polling for quotes reads as a 2018 product when the upstream supports streams.
 
 ---
 
