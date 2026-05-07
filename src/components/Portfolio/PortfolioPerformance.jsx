@@ -142,21 +142,21 @@ const PortfolioPerformance = () => {
 	const perfLabels = perfHistory.map(item => new Date(item.date).toLocaleDateString());
 	const perfValues = perfHistory.map(item => item.value);
 
-	// Chart colors
+	// Chart colors — match new amber accent + semantic gain/loss tokens
 	const getChartColors = () => {
 		if (isDarkMode) {
 			return {
-				primary: "rgb(192, 132, 252)",
-				secondary: "rgb(168, 85, 247)",
-				success: "rgb(34, 197, 94)",
-				danger: "rgb(239, 68, 68)",
+				primary: "oklch(76% 0.16 60)",
+				secondary: "oklch(82% 0.15 60)",
+				success: "oklch(72% 0.16 145)",
+				danger: "oklch(66% 0.22 25)",
 			};
 		}
 		return {
-			primary: "rgb(168, 85, 247)",
-			secondary: "rgb(147, 51, 234)",
-			success: "rgb(34, 197, 94)",
-			danger: "rgb(239, 68, 68)",
+			primary: "oklch(64% 0.16 60)",
+			secondary: "oklch(56% 0.15 60)",
+			success: "oklch(64% 0.14 145)",
+			danger: "oklch(56% 0.20 25)",
 		};
 	};
 
@@ -515,7 +515,7 @@ const PortfolioPerformance = () => {
 					<CardHeader className="pb-4">
 						<div className="flex items-center justify-between">
 							<CardTitle className="text-slate-900 dark:text-slate-50 flex items-center gap-3">
-								<div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-lg flex items-center justify-center">
+								<div className="w-10 h-10 bg-[var(--accent-soft)] border border-[var(--border)] flex items-center justify-center">
 									<TrendingUp className="h-5 w-5 text-white" />
 								</div>
 								<div>
@@ -550,8 +550,8 @@ const PortfolioPerformance = () => {
 					<CardHeader className="pb-4">
 						<div className="flex items-center justify-between">
 							<CardTitle className="text-slate-900 dark:text-slate-50 flex items-center gap-3">
-								<div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center">
-									<PieChart className="h-5 w-5 text-white" />
+								<div className="w-10 h-10 bg-[var(--accent-soft)] border border-[var(--border)] flex items-center justify-center">
+									<PieChart className="h-5 w-5 text-[var(--accent)]" />
 								</div>
 								<div>
 									<div className="text-lg font-bold">Sector Allocation</div>
@@ -574,8 +574,8 @@ const PortfolioPerformance = () => {
 				<CardHeader className="pb-4">
 					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 						<div className="flex items-center gap-3">
-							<div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-								<Activity className="h-5 w-5 text-white" />
+							<div className="w-10 h-10 bg-[var(--accent-soft)] border border-[var(--border)] flex items-center justify-center">
+								<Activity className="h-5 w-5 text-[var(--accent)]" />
 							</div>
 							<div>
 								<CardTitle className="text-slate-900 dark:text-slate-50 text-lg font-bold">
@@ -600,8 +600,8 @@ const PortfolioPerformance = () => {
 				<CardContent>
 					{portfolio.holdings.length === 0 ? (
 						<div className="text-center py-16">
-							<div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
-								<BarChart3 className="w-10 h-10 text-purple-600 dark:text-purple-400" />
+							<div className="w-20 h-20 bg-[var(--accent-soft)] border border-[var(--border)] rounded-full flex items-center justify-center mx-auto mb-6">
+								<BarChart3 className="w-10 h-10 text-[var(--accent)]" />
 							</div>
 							<h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-2">
 								No holdings yet
@@ -611,7 +611,7 @@ const PortfolioPerformance = () => {
 							</p>
 							<Button
 								onClick={() => setShowAddHolding(true)}
-								className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+								className="bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-fg)] rounded-none px-6 py-2.5 text-sm font-semibold tracking-wide"
 							>
 								<Plus className="w-4 h-4 mr-2" />
 								Add Your First Holding
@@ -722,7 +722,7 @@ const PortfolioPerformance = () => {
 					<Card className="w-full max-w-md bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-slate-200 dark:border-slate-700 shadow-2xl">
 						<CardHeader className="pb-4">
 							<div className="flex items-center gap-3">
-								<div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-lg flex items-center justify-center">
+								<div className="w-10 h-10 bg-[var(--accent-soft)] border border-[var(--border)] flex items-center justify-center">
 									<Plus className="h-5 w-5 text-white" />
 								</div>
 								<div>

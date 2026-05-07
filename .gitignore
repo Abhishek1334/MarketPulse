@@ -36,3 +36,19 @@ dist-ssr/
 .cache/
 .eslintcache/
 
+# Test + tooling artefacts
+.playwright-mcp/
+test-results/
+playwright-report/
+playwright/.cache/
+.vercel/
+
+# Loose images at repo root (browser captures, debugging screenshots, etc.)
+# Keep real assets in /public and /screenshots tracked.
+/*.png
+/*.jpg
+/*.jpeg
+/*.webp
+!public/**
+!screenshots/**
+
