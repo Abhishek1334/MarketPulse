@@ -52,7 +52,7 @@ export const validateStock = async (req, res) => {
 		});
 	} catch (error) {
 		console.error("Error validating stock symbol:", error);
-		res.status(error.status || 500).json({
+		res.status(error.statusCode || 500).json({
 			message: error.message || "Failed to validate stock symbol.",
 		});
 	}
@@ -138,45 +138,31 @@ export const getStockChartData = async (req, res, next) => {
 	try {
 		const { symbol, interval = "1d", startDate, endDate } = req.query;
 
-		
-		// Validate required parameters
 		if (!symbol || !startDate || !endDate) {
-			throw createError(
-				400,
-				"Symbol, startDate, and endDate are required"
-			);
+			throw createError("Symbol, startDate, and endDate are required", 400);
 		}
 		const cleanedSymbol = symbol.trim().toUpperCase();
 		if (!/^[A-Z]{1,5}$/.test(cleanedSymbol)) {
-			throw createError(400, "Invalid stock symbol format");
+			throw createError("Invalid stock symbol format", 400);
 		}
 
-
-		// Validate stock symbol format
-		if (!/^[A-Za-z]{1,5}$/.test(cleanedSymbol)) {
-			throw createError(400, "Invalid stock symbol format");
-		}
-
-		// Convert and validate dates
 		const currentDate = new Date();
 		const start = new Date(startDate);
 		const end = new Date(endDate);
 
-		if (isNaN(start)) throw createError(400, "Invalid startDate format");
-		if (isNaN(end)) throw createError(400, "Invalid endDate format");
+		if (isNaN(start)) throw createError("Invalid startDate format", 400);
+		if (isNaN(end)) throw createError("Invalid endDate format", 400);
 		if (start > currentDate || end > currentDate) {
-			throw createError(400, "Cannot request future dates");
+			throw createError("Cannot request future dates", 400);
 		}
 		if (start >= end) {
-			throw createError(400, "End date must be after start date");
+			throw createError("End date must be after start date", 400);
 		}
 
-		// Format dates for Twelve Data API (YYYY-MM-DD)
 		const formatDate = (date) => date.toISOString().split("T")[0];
 		const startDateStr = formatDate(start);
 		const endDateStr = formatDate(end);
-		
-		// Map interval format (Twelve Data uses different format)
+
 		const intervalMap = {
 			"1m": "1min",
 			"5m": "5min",
@@ -189,8 +175,7 @@ export const getStockChartData = async (req, res, next) => {
 			"1mo": "1month"
 		};
 		const twelveDataInterval = intervalMap[interval] || interval;
-		
-		// Fetch data from Twelve Data time_series endpoint
+
 		const response = await axios.get(
 			`https://api.twelvedata.com/time_series`,
 			{
@@ -205,16 +190,16 @@ export const getStockChartData = async (req, res, next) => {
 			}
 		);
 
-		// Validate response structure
 		if (response.data.status === "error") {
-			throw createError(400, response.data.message || "Invalid data format from financial API");
+			throw createError(response.data.message || "Invalid data format from financial API", 400);
 		}
 
 		if (!response.data.values || !Array.isArray(response.data.values)) {
-			throw createError(502, "Invalid data format from financial API");
+			throw createError("Invalid data format from financial API", 502);
 		}
 
-		// Process and validate quotes
+		const rawCount = response.data.values.length;
+
 		const values = response.data.values
 			.map((quote) => {
 				try {
@@ -239,16 +224,12 @@ export const getStockChartData = async (req, res, next) => {
 					item.low !== null &&
 					item.close !== null
 			)
-			.reverse(); // Twelve Data returns newest first, reverse to get chronological order
+			.reverse();
 
 		if (values.length === 0) {
-			throw createError(
-				404,
-				"No valid price data found for the selected range"
-			);
+			throw createError("No valid price data found for the selected range", 404);
 		}
 
-		// Build metadata
 		const meta = {
 			symbol: response.data.meta?.symbol || cleanedSymbol.toUpperCase(),
 			exchange: response.data.meta?.exchange || "Unknown Exchange",
@@ -261,22 +242,22 @@ export const getStockChartData = async (req, res, next) => {
 			meta,
 			values,
 			warning:
-				chartData.quotes.length !== values.length
+				rawCount !== values.length
 					? "Some data points were filtered due to invalid format"
 					: undefined,
 		});
 	} catch (error) {
-	console.error(
-		`Chart data error for ${req?.query?.symbol || "unknown symbol"}:`,
-		error
-	);
-	next(
-		createError(
-			error.status || 500,
-			error.message || "Failed to fetch chart data"
-		)
-	);
-}
+		console.error(
+			`Chart data error for ${req?.query?.symbol || "unknown symbol"}:`,
+			error
+		);
+		next(
+			createError(
+				error.message || "Failed to fetch chart data",
+				error.statusCode || 500
+			)
+		);
+	}
 };
 
 

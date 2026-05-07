@@ -1,176 +1,188 @@
-# Market Pulse 📈
+# MarketPulse
 
-LIVE SITE: https://market-pulse-two.vercel.app/
+A stock market analytics SPA: watchlists, portfolio tracking, interactive price charts, technical indicators, and AI-powered insights.
 
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![Zustand](https://img.shields.io/badge/Zustand-007acc?style=for-the-badge&logo=zustand&logoColor=white)
-![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white)
-![React Query](https://img.shields.io/badge/React_Query-FF4154?style=for-the-badge&logo=reactquery&logoColor=white)
-![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+**Live:** https://market-pulse-two.vercel.app/
+**Source:** https://github.com/Abhishek1334/MarketPulse
+
+> Built as a portfolio piece to practice fullstack development end-to-end: auth, third-party API integration, charting, state management, and deployment across two platforms.
 
 ---
 
-> **Market Pulse** is a modern stock market analytics platform for traders, investors, and financial enthusiasts. It features real-time data, beautiful interactive charts, advanced technical analysis, portfolio management, and a world-class UI/UX.
+## Stack
+
+| Layer | Choice | Why |
+| --- | --- | --- |
+| Frontend | React 19, Vite 6, Tailwind v4 | Fast dev loop, modern build, utility-first styling |
+| State | Zustand (auth/UI) + TanStack Query (server data) | Clear split between client state and server cache |
+| Charts | Chart.js + react-chartjs-2 | Light footprint vs. heavier alternatives |
+| UI primitives | shadcn/ui (Radix + cva), lucide-react icons | Accessible, copy-paste, no runtime dep on a UI lib |
+| Animations | GSAP + ScrollTrigger | Smooth scroll-driven entrances |
+| Backend | Express 5, Mongoose, MongoDB Atlas | Familiar Node stack, fast iteration |
+| Auth | JWT (Bearer in `Authorization` header) | Simple, works without sessions |
+| Market data | Twelve Data (search, quote, time-series) | Single provider after migrating off Yahoo Finance |
+| AI | Vercel AI SDK v6 + Google Gemini 2.5 Flash (free tier) | Tool-call-driven assistant, streaming via `pipeUIMessageStreamToResponse` |
+| Hosting | **Vercel** (single deploy: frontend + Express as a Function) | Single platform, sub-second cold start via Fluid Compute, free Hobby plan |
+
+## Features
+
+- **Watchlists** — multiple per user, add/remove stocks, live quotes.
+- **Portfolio tracking** — holdings + transactions persisted to MongoDB. Real-time current prices fetched on load.
+- **Stock analytics** — interactive Chart.js price charts with technical indicators (RSI, MACD, SMA, EMA), timeframe + interval picker.
+- **Symbol search** — Twelve Data search debounced through a server-cached endpoint.
+- **AI Assistant** (`/assistant`) — natural-language Q&A about your portfolio and any stock. Tool-calling agent fetches live data through three tools: `getPortfolioSummary`, `getStockQuote`, `searchSymbol`. Streams responses via Server-Sent Events.
+- **Light + dark mode** — fully themed via CSS variables.
+- **Server-side response cache** — namespace-scoped TTL cache (60s for quotes, 5min for charts, 1h for search/validate) extends the free-tier API quota during demos. Cache stats exposed at `/api/stock/_cache-stats`.
 
 ---
 
-## 🚀 Features
+## Architecture
 
-- 📊 Real-time Stock Charting & Analytics
-- 🧑‍💼 **Portfolio Management** (track holdings, performance, sector allocation)
-- 🧠 **Technical Indicators** (RSI, MACD, SMA, EMA, Bollinger Bands)
-- 🛎️ **Advanced Price Alerts** (price, % change, volume, technical triggers)
-- 🔄 Toggle Metrics: Open, Close, High, Low, Volume
-- 🗂️ Watchlists & Quick Stock Search
-- 🧩 Modular, Scalable Component Architecture
-- 🧹 Optimized Data Fetching & Rate-Limiting
-- 🎨 Responsive, Mobile-Friendly, Light/Dark Mode
-- 🛡️ Delete Confirmation Modals & Error Handling
-- 🌈 Modern, accessible, and branded UI/UX
-
----
-
-## 🛠️ Tech Stack
-
-| Category         | Technologies                                                 |
-| ---------------- | ------------------------------------------------------------- |
-| **Frontend**     | React.js, Vite, Tailwind CSS                                  |
-| **State Mgmt**   | Zustand                                                      |
-| **Charting**     | Chart.js                                                      |
-| **APIs**         | Yahoo Finance, Twelve Data                                    |
-| **Backend**      | Node.js, Express.js, JWT (Authentication)                     |
-| **Deployment**   | Vercel (Frontend), Railway (Backend)                          |
-
----
-
-## 🏁 Getting Started
-
-### 1. **Clone the repo**
-```bash
-git clone https://github.com/your-username/market-pulse.git
-cd market-pulse
+```
+┌──────────────────────────────────────────┐
+│              Vercel deployment            │
+│                                           │
+│  ┌──────────────┐    ┌──────────────────┐ │
+│  │ React SPA    │ /api/* │ Express app  │ │
+│  │ (static dist)│ ─────► │ (Function)   │ │
+│  └──────────────┘    └─────┬────────────┘ │
+└─────────────────────────────┼─────────────┘
+              │               │
+   localStorage               │ Mongoose (cached connection)
+   (auth + theme)             ▼
+                       ┌─────────────┐
+                       │  MongoDB    │
+                       │  Atlas      │
+                       └─────────────┘
+                              ▲
+                              │
+              Twelve Data API ┘
+              (proxied through Function,
+              API key never reaches client)
 ```
 
-### 2. **Install dependencies**
+**Data ownership:**
+- **Server-of-record (Mongo):** users, watchlists, portfolio holdings, transactions, settings.
+- **Client-only (Zustand persist → localStorage):** auth token, theme.
+
+---
+
+## Notable design decisions
+
+**API proxy, not direct calls.** All Twelve Data requests go through Express. The API key stays server-side. Client never sees it. (The downside: every quote lookup costs you a server roundtrip, so we cache aggressively.)
+
+**Hybrid state model.** Zustand for things the client owns (auth, UI). TanStack Query for things the server owns (watchlists). Portfolio uses Zustand-as-cache + explicit `loadPortfolio()` actions that call the API — pragmatic, but a future cleanup would move it fully into TanStack Query.
+
+**Embedded subdocuments.** Holdings and transactions live as subdoc arrays inside one `Portfolio` doc per user, mirroring the watchlist+stocks shape. Trade-off: simpler reads, harder atomic updates at scale. Fine for the use case.
+
+**Client-side rate limiter for chart fetches.** A `useRateLimitedFetch` hook batches and dedupes chart requests with a 5-minute TTL cache. It does *not* protect the actual API quota — that's the server's job — but it dramatically reduces redundant requests when a user toggles intervals.
+
+---
+
+## Trade-offs and known limits
+
+- **JWT in localStorage.** Simple, but XSS-readable. A production version would use httpOnly cookies.
+- **Two hosts.** Frontend on Vercel, backend on Railway. Two CI pipelines, two cold starts. A future cut would consolidate to Vercel Functions.
+- **No tests yet.** Build/lint pass on PR; runtime behavior is verified manually.
+- **No real-time prices.** Quotes refresh on user action, not via WebSocket.
+- **Bundle size.** ~344 KB gzipped — Chart.js + GSAP are the bulk.
+
+---
+
+## Getting started
+
+Requires Node 20+ and a MongoDB connection string.
+
 ```bash
+git clone git@github.com:Abhishek1334/MarketPulse.git
+cd MarketPulse
 npm install
+cd server && npm install && cd ..
 ```
 
-### 3. **Run locally**
+Create a `.env` in `server/`:
+
+```env
+MONGO_URI=mongodb+srv://...
+JWT_SECRET=<a long random string>
+TWELVE_DATA_API_KEY=<from twelvedata.com — free>
+GOOGLE_GENERATIVE_AI_API_KEY=<from aistudio.google.com/app/apikey — free, optional, enables /assistant>
+PORT=5000
+```
+
+> The AI Assistant uses Google Gemini 2.5 Flash, which has a permanently free tier on Google AI Studio (no card required). If `GOOGLE_GENERATIVE_AI_API_KEY` is missing, the `/assistant` page surfaces a "not configured" message instead of crashing.
+
+Run dev (two terminals):
+
 ```bash
+# terminal 1 — backend
+npm run dev:server
+
+# terminal 2 — frontend
 npm run dev
 ```
 
-### 4. **Build for production**
+Build for production:
+
 ```bash
 npm run build
 ```
 
----
+## Deploy to Vercel (5 minutes, free)
 
-## 🚦 Deployment Readiness
-- ✅ No debug logs or test code in production
-- ✅ All user flows (add/edit/delete holdings, charts, modals) work as expected
-- ✅ No crashes or unhandled errors in the UI
-- ✅ All state updates are correct and persistent
-- ✅ UI is polished, modern, and consistent
-- ✅ No sensitive data exposed in the client
-- ✅ Dark mode and light mode both look great
-- ✅ All charts and analytics are robust to empty/edge cases
+The repo is set up so the Express backend runs as a single Vercel Function alongside the static frontend.
 
----
+1. **Push the repo to GitHub** (if not already).
+2. **Create a Vercel project**: vercel.com → Add New → Project → import the repo.
+   - Framework preset: **Vite** (auto-detected).
+   - Root directory: leave as repo root.
+   - Build command, output directory: leave defaults.
+3. **Set environment variables** in the project settings → Environment Variables. Add for *Production + Preview + Development*:
+   ```
+   MONGO_URI                       (your MongoDB Atlas connection string)
+   JWT_SECRET                      (any long random string)
+   TWELVE_DATA_API_KEY             (free key from twelvedata.com)
+   GOOGLE_GENERATIVE_AI_API_KEY    (free key from aistudio.google.com/app/apikey)
+   ```
+4. **Click Deploy.** First build takes ~2 minutes.
 
-## 🖼️ Screenshots
+That's it. Frontend and backend live on the same domain — no CORS config, no two-host coordination, no sleep.
 
-### **Light Mode**
-
-<table>
-  <tr>
-    <td><b>Homepage</b></td>
-    <td><b>Login Page</b></td>
-    <td><b>Signup Page</b></td>
-  </tr>
-  <tr>
-    <td><img src="./screenshots/Homepage_Light.png" alt="Homepage Light Mode" width="500"/></td>
-    <td><img src="./screenshots/Login_Light.png" alt="Login Light Mode" width="500"/></td>
-    <td><img src="./screenshots/SignUp_Light.png" alt="Signup Light Mode" width="500"/></td>
-  </tr>
-  <tr>
-    <td><b>Dashboard</b></td>
-    <td><b>Analytics Page 1</b></td>
-    <td><b>Analytics Page 2</b></td>
-  </tr>
-  <tr>
-    <td><img src="./screenshots/Dashboard_Light.png" alt="Dashboard Light Mode" width="500"/></td>
-    <td><img src="./screenshots/Analytics1_Light.png" alt="Analytics Page 1 Light Mode" width="500"/></td>
-    <td><img src="./screenshots/Analytics2_Light.png" alt="Analytics Page 2 Light Mode" width="500"/></td>
-  </tr>
-  <tr>
-    <td><b>Watchlist</b></td>
-    <td><b>Portfolio Page 1</b></td>
-    <td><b>Portfolio Page 2</b></td>
-  </tr>
-  <tr>
-    <td><img src="./screenshots/Watchlist_Light.png" alt="Watchlist Light Mode" width="500"/></td>
-    <td><img src="./screenshots/Portfolio1_Light.png" alt="Portfolio Page 1 Light Mode" width="500"/></td>
-    <td><img src="./screenshots/Portfolio2_Light.png" alt="Portfolio Page 2 Light Mode" width="500"/></td>
-  </tr>
-</table>
-
-### **Dark Mode**
-
-<table>
-  <tr>
-    <td><b>Homepage</b></td>
-    <td><b>Login Page</b></td>
-    <td><b>Signup Page</b></td>
-  </tr>
-  <tr>
-    <td><img src="./screenshots/Homapage_Dark.png" alt="Homepage Dark Mode" width="500"/></td>
-    <td><img src="./screenshots/Login_Dark.png" alt="Login Dark Mode" width="500"/></td>
-    <td><img src="./screenshots/SignUp_Dark.png" alt="Signup Dark Mode" width="500"/></td>
-  </tr>
-  <tr>
-    <td><b>Dashboard</b></td>
-    <td><b>Analytics Page 1</b></td>
-    <td><b>Analytics Page 2</b></td>
-  </tr>
-  <tr>
-    <td><img src="./screenshots/Dashboard_Dark.png" alt="Dashboard Dark Mode" width="500"/></td>
-    <td><img src="./screenshots/Analytics1_Dark.png" alt="Analytics Page 1 Dark Mode" width="500"/></td>
-    <td><img src="./screenshots/Analytics2_Dark.png" alt="Analytics Page 2 Dark Mode" width="500"/></td>
-  </tr>
-  <tr>
-    <td><b>Watchlist</b></td>
-    <td><b>Portfolio Page 1</b></td>
-    <td><b>Portfolio Page 2</b></td>
-  </tr>
-  <tr>
-    <td><img src="./screenshots/Watchlist_Dark.png" alt="Watchlist Dark Mode" width="500"/></td>
-    <td><img src="./screenshots/Portfolio1_Dark.png" alt="Portfolio Page 1 Dark Mode" width="500"/></td>
-    <td><img src="./screenshots/Portfolio2_Dark.png" alt="Portfolio Page 2 Dark Mode" width="500"/></td>
-  </tr>
-</table>
+### How it's wired
+- `api/[...slug].js` is a Vercel Function (catch-all filename) that exports the Express app.
+- `vercel.json` sets `maxDuration: 60s` for the Function (covers AI streaming) and rewrites all non-`/api/*` paths to `index.html` for SPA routing.
+- `server/db.js` caches the Mongoose connection on `globalThis` so warm Function invocations reuse it instead of opening a new one each request.
+- `server/app.js` runs an Express middleware that awaits `connectDB()` before any handler — fast on warm starts, transparent on cold.
 
 ---
 
-## 📚 API Documentation
+## Screenshots
 
-- **Provider 1:** [Yahoo Finance](https://www.yahoofinanceapi.com/)
-- **Provider 2:** [Twelve Data](https://twelvedata.com/docs/)
+### Light mode
+| Homepage | Dashboard | Analytics |
+| --- | --- | --- |
+| ![Homepage](./screenshots/Homepage_Light.png) | ![Dashboard](./screenshots/Dashboard_Light.png) | ![Analytics](./screenshots/Analytics1_Light.png) |
+
+### Dark mode
+| Homepage | Dashboard | Analytics |
+| --- | --- | --- |
+| ![Homepage](./screenshots/Homapage_Dark.png) | ![Dashboard](./screenshots/Dashboard_Dark.png) | ![Analytics](./screenshots/Analytics1_Dark.png) |
+
+Full screenshot set in [`/screenshots`](./screenshots).
+
+---
+
+## What I'd do differently next time
+
+- **TypeScript from day one.** Most defects in this repo were prop-shape or response-shape mismatches that TS would have caught.
+- **One backend host.** Cold-start coordination across Vercel + Railway adds latency and complexity.
+- **Tests as a first-class citizen.** Even a small Vitest + Playwright harness would have caught the API-argument-order bug class.
+- **Move the rate limiter server-side.** Client-side counters protect the user's UX, not the API quota — those are different problems.
 
 ---
 
-## 📬 Contact
+## Contact
 
-Let's connect!
-
-- **LinkedIn:** [Abhishek Rajoria](https://linkedin.com/in/AbhishekRajoria)
-- **Email:** AbhishekRajoria24@gmail.com
-
----
-
-> *"In investing, what is comfortable is rarely profitable."* — **Market Pulse** 📈
-
----
+- GitHub: [@Abhishek1334](https://github.com/Abhishek1334)
+- LinkedIn: [Abhishek Rajoria](https://linkedin.com/in/AbhishekRajoria)
+- Email: AbhishekRajoria24@gmail.com

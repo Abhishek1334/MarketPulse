@@ -1,0 +1,8 @@
+# Vercel uses the root package.json for the function bundle.
+# server/ files are imported by api/[...slug].js — Vercel bundles them
+# automatically; we just exclude server/ install metadata to avoid Vercel
+# treating it as a separate workspace.
+server/package.json
+server/package-lock.json
+server/node_modules
+testingRateLimit.js
