@@ -1,11 +1,11 @@
 {
 	"framework": "vite",
 	"functions": {
-		"api/[...slug].js": {
+		"api/[[...slug]].js": {
 			"maxDuration": 60
 		}
 	},
 	"rewrites": [
-		{ "source": "/((?!api/).*)", "destination": "/index.html" }
+		{ "source": "/((?!api(/|$)).*)", "destination": "/index.html" }
 	]
 }
