@@ -10,6 +10,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import HomePage from "../pages/Homepage";
 import Layout from "../components/Layout";
 import NotFoundPage from "@/pages/NotFoundPage";
+import AssistantPage from "../pages/AssistantPage";
 export const router = createBrowserRouter([
 	{
 		path: "/",
@@ -44,6 +45,10 @@ export const router = createBrowserRouter([
 							{
 								path: "portfolio",
 								element: <PortfolioPage />,
+							},
+							{
+								path: "assistant",
+								element: <AssistantPage />,
 							},
 							{
 								path: "watchlist/:watchlistId",

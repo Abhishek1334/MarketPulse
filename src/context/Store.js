@@ -1,5 +1,20 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import {
+	fetchPortfolio,
+	apiAddHolding,
+	apiUpdateHolding,
+	apiDeleteHolding,
+	apiAddTransaction,
+	apiUpdatePortfolioSettings,
+	apiImportPortfolio,
+	fetchBatchQuotes,
+} from "@/api/portfolio";
+
+const normalizeHoldings = (arr = []) =>
+	arr.map((h) => ({ ...(h.toObject ? h.toObject() : h), id: h.id || h._id }));
+const normalizeTransactions = (arr = []) =>
+	arr.map((t) => ({ ...(t.toObject ? t.toObject() : t), id: t.id || t._id }));
 
 const useStore = create(
 	persist(
@@ -102,61 +117,56 @@ const useStore = create(
 			},
 
 			// Portfolio Actions
-			addHolding: (holding) =>
+			addHolding: async (holding) => {
+				const data = await apiAddHolding({
+					symbol: holding.symbol,
+					shares: holding.shares,
+					averagePrice: holding.averagePrice,
+					purchaseDate: holding.purchaseDate,
+					notes: holding.notes,
+					sector: holding.sector,
+				});
 				set((state) => ({
 					portfolio: {
 						...state.portfolio,
-						holdings: [...state.portfolio.holdings, {
-							id: Date.now().toString(),
-							symbol: holding.symbol.toUpperCase(),
-							shares: parseFloat(holding.shares),
-							averagePrice: parseFloat(holding.averagePrice),
-							purchaseDate: holding.purchaseDate || new Date().toISOString(),
-							notes: holding.notes || '',
-							sector: holding.sector || 'Unknown',
-							createdAt: new Date().toISOString(),
-							updatedAt: new Date().toISOString()
-						}]
-					}
-				})),
+						holdings: normalizeHoldings(data.holdings),
+						transactions: normalizeTransactions(data.transactions),
+					},
+				}));
+				get().calculatePortfolioMetrics();
+			},
 
-			updateHolding: (holdingId, updates) =>
+			updateHolding: async (holdingId, updates) => {
+				const data = await apiUpdateHolding(holdingId, updates);
 				set((state) => ({
 					portfolio: {
 						...state.portfolio,
-						holdings: state.portfolio.holdings.map((holding) =>
-							holding.id === holdingId
-								? { ...holding, ...updates, updatedAt: new Date().toISOString() }
-								: holding
-						)
-					}
-				})),
+						holdings: normalizeHoldings(data.holdings),
+					},
+				}));
+				get().calculatePortfolioMetrics();
+			},
 
-			removeHolding: (holdingId) =>
+			removeHolding: async (holdingId) => {
+				const data = await apiDeleteHolding(holdingId);
 				set((state) => ({
 					portfolio: {
 						...state.portfolio,
-						holdings: state.portfolio.holdings.filter((h) => h.id !== holdingId)
-					}
-				})),
+						holdings: normalizeHoldings(data.holdings),
+					},
+				}));
+				get().calculatePortfolioMetrics();
+			},
 
-			addTransaction: (transaction) =>
+			addTransaction: async (transaction) => {
+				const data = await apiAddTransaction(transaction);
 				set((state) => ({
 					portfolio: {
 						...state.portfolio,
-						transactions: [...state.portfolio.transactions, {
-							id: Date.now().toString(),
-							symbol: transaction.symbol.toUpperCase(),
-							type: transaction.type, // 'buy', 'sell', 'dividend', 'split'
-							shares: parseFloat(transaction.shares),
-							price: parseFloat(transaction.price),
-							date: transaction.date || new Date().toISOString(),
-							fees: parseFloat(transaction.fees) || 0,
-							notes: transaction.notes || '',
-							createdAt: new Date().toISOString()
-						}]
-					}
-				})),
+						transactions: normalizeTransactions(data.transactions),
+					},
+				}));
+			},
 
 			updatePortfolioPerformance: (performance) =>
 				set((state) => ({
@@ -166,13 +176,12 @@ const useStore = create(
 					}
 				})),
 
-			updatePortfolioSettings: (settings) =>
+			updatePortfolioSettings: async (settings) => {
+				const data = await apiUpdatePortfolioSettings(settings);
 				set((state) => ({
-					portfolio: {
-						...state.portfolio,
-						settings: { ...state.portfolio.settings, ...settings }
-					}
-				})),
+					portfolio: { ...state.portfolio, settings: data.settings },
+				}));
+			},
 
 			// Portfolio Calculations
 			calculatePortfolioMetrics: () => {
@@ -236,41 +245,29 @@ const useStore = create(
 					.sort((a, b) => new Date(b.date) - new Date(a.date))
 					.slice(0, 20);
 
-				// Performance over time
+				// Performance over time — derived from real transactions only.
+				// Empty array signals the UI to show an "add transactions" empty state.
 				let performanceHistory = [];
 				if (transactions.length > 0) {
-					// Existing logic for real transactions
-					const txHistory = transactions
-						.filter(t => t.type === 'buy' || t.type === 'sell')
-						.reduce((acc, transaction) => {
-							const date = new Date(transaction.date).toDateString();
-							if (!acc[date]) {
-								acc[date] = { date, value: 0, transactions: 0 };
-							}
-							acc[date].value += transaction.type === 'buy' ? 
-								-(transaction.shares * transaction.price) : 
-								(transaction.shares * transaction.price);
-							acc[date].transactions += 1;
-							return acc;
-						}, {});
-					performanceHistory = Object.values(txHistory);
-				} else if (holdings.length > 0) {
-					// No transactions, but there are holdings: generate mock 30-day time series
-					const today = new Date();
-					let baseValue = performance.totalValue || 10000;
-					for (let i = 29; i >= 0; i--) {
-						const date = new Date(today);
-						date.setDate(today.getDate() - i);
-						// Simulate small daily changes
-						baseValue = baseValue * (1 + (Math.random() - 0.5) * 0.01);
-						performanceHistory.push({
-							date: date.toLocaleDateString(),
-							value: Math.round(baseValue)
-						});
-					}
-				} else {
-					// No holdings: show empty chart
-					performanceHistory = [];
+					const sorted = [...transactions]
+						.filter((t) => t.type === "buy" || t.type === "sell")
+						.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+					let runningCostBasis = 0;
+					const byDate = sorted.reduce((acc, t) => {
+						runningCostBasis +=
+							t.type === "buy"
+								? t.shares * t.price + (t.fees || 0)
+								: -(t.shares * t.price) + (t.fees || 0);
+						const date = new Date(t.date).toLocaleDateString();
+						acc[date] = {
+							date,
+							value: Math.round(runningCostBasis),
+							transactions: (acc[date]?.transactions || 0) + 1,
+						};
+						return acc;
+					}, {});
+					performanceHistory = Object.values(byDate);
 				}
 
 				return {
@@ -295,44 +292,63 @@ const useStore = create(
 					.sort((a, b) => new Date(b.date) - new Date(a.date));
 			},
 
-			// Export portfolio data
-			exportPortfolio: () => {
-				const state = get();
-				return {
-					holdings: state.portfolio.holdings,
-					transactions: state.portfolio.transactions,
-					performance: state.portfolio.performance,
-					settings: state.portfolio.settings,
-					exportDate: new Date().toISOString()
-				};
-			},
-
-			// Import portfolio data
-			importPortfolio: (data) => {
-				if (data.holdings && data.transactions) {
+			// Load portfolio from API (call on PortfolioPage mount)
+			loadPortfolio: async () => {
+				try {
+					const data = await fetchPortfolio();
+					let holdings = normalizeHoldings(data.holdings);
+					const symbols = [...new Set(holdings.map((h) => h.symbol))];
+					if (symbols.length > 0) {
+						try {
+							const quotes = await fetchBatchQuotes(symbols);
+							const priceMap = Object.fromEntries(
+								quotes.map((q) => [q.symbol, q.price])
+							);
+							holdings = holdings.map((h) => ({
+								...h,
+								currentPrice: priceMap[h.symbol] ?? h.averagePrice,
+							}));
+						} catch (priceErr) {
+							console.warn("Quote fetch failed; using averagePrice fallback:", priceErr);
+						}
+					}
 					set((state) => ({
 						portfolio: {
 							...state.portfolio,
-							holdings: data.holdings || [],
-							transactions: data.transactions || [],
-							performance: data.performance || state.portfolio.performance,
-							settings: { ...state.portfolio.settings, ...data.settings }
-						}
+							holdings,
+							transactions: normalizeTransactions(data.transactions),
+							settings: data.settings || state.portfolio.settings,
+						},
 					}));
-					return true;
+					get().calculatePortfolioMetrics();
+				} catch (error) {
+					console.error("loadPortfolio failed:", error);
 				}
-				return false;
 			},
 
-			// Clear portfolio
-			clearPortfolio: () =>
-				set((state) => ({
-					portfolio: {
-						...state.portfolio,
-						holdings: [],
-						transactions: []
+			// One-time migration of pre-API localStorage portfolio data
+			migrateLocalPortfolio: async () => {
+				if (localStorage.getItem("mp_portfolio_migrated")) return;
+				try {
+					const stored = localStorage.getItem("stock-dashboard-store");
+					const parsed = stored ? JSON.parse(stored) : null;
+					const old = parsed?.state?.portfolio;
+					const hasData =
+						(Array.isArray(old?.holdings) && old.holdings.length > 0) ||
+						(Array.isArray(old?.transactions) && old.transactions.length > 0);
+					if (hasData) {
+						await apiImportPortfolio({
+							holdings: old.holdings,
+							transactions: old.transactions,
+							settings: old.settings,
+						});
 					}
-				})),
+				} catch (error) {
+					console.error("migrateLocalPortfolio failed:", error);
+				} finally {
+					localStorage.setItem("mp_portfolio_migrated", "1");
+				}
+			},
 
 			// ---- Theme State ----
 			theme: "light",
@@ -352,7 +368,6 @@ const useStore = create(
 			partialize: (state) => ({
 				user: state.user,
 				theme: state.theme,
-				portfolio: state.portfolio,
 			}),
 		}
 	)

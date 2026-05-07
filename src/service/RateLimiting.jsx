@@ -36,7 +36,6 @@ const useRateLimitedFetch = () => {
 			const now = Date.now();
 
 			if (cached && now - cached.timestamp < CACHE_TTL) {
-				(`Cache hit for ${key}:`, cached.data);
 				return { success: true, data: cached.data };
 			}
 

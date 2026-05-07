@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Search, Menu, LogOut, X, User, BarChart3, PieChart } from "lucide-react";
+import { Search, Menu, LogOut, X, User, BarChart3, PieChart, Sparkles } from "lucide-react";
 import { gsap } from "gsap";
 import useStore from "../context/Store";
 import StockSearchBar from "./StockSearchBar";
@@ -158,11 +158,11 @@ export default function Navbar() {
 									
 									{location.pathname !== "/portfolio" && (
 										<Link to="/portfolio">
-											<Button 
+											<Button
 												variant={isActiveRoute("/portfolio") ? "default" : "ghost"}
 												className={`${
-													isActiveRoute("/portfolio") 
-														? "bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-lg" 
+													isActiveRoute("/portfolio")
+														? "bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-lg"
 														: "hover:bg-[var(--background-200)]"
 												} transition-all duration-200`}
 											>
@@ -171,7 +171,23 @@ export default function Navbar() {
 											</Button>
 										</Link>
 									)}
-									
+
+									{location.pathname !== "/assistant" && (
+										<Link to="/assistant">
+											<Button
+												variant={isActiveRoute("/assistant") ? "default" : "ghost"}
+												className={`${
+													isActiveRoute("/assistant")
+														? "bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-lg"
+														: "hover:bg-[var(--background-200)]"
+												} transition-all duration-200`}
+											>
+												<Sparkles className="w-4 h-4 md:mr-2" />
+												<span className="hidden lg:inline">Assistant</span>
+											</Button>
+										</Link>
+									)}
+
 									{/* Profile info - Show from md, full text from lg */}
 									<div className="hidden md:flex items-center space-x-2 px-2 md:px-3 py-2 bg-[var(--background-200)] rounded-lg">
 										<div className="w-7 h-7 md:w-8 md:h-8 bg-gradient-to-br from-primary-500 to-accent-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -237,12 +253,24 @@ export default function Navbar() {
 									
 									{location.pathname !== "/portfolio" && (
 										<Link to="/portfolio" onClick={() => setIsMenuOpen(false)}>
-											<Button 
-												variant="ghost" 
+											<Button
+												variant="ghost"
 												className="w-full justify-start hover:bg-[var(--background-200)]"
 											>
 												<PieChart className="w-4 h-4 mr-3" />
 												Portfolio
+											</Button>
+										</Link>
+									)}
+
+									{location.pathname !== "/assistant" && (
+										<Link to="/assistant" onClick={() => setIsMenuOpen(false)}>
+											<Button
+												variant="ghost"
+												className="w-full justify-start hover:bg-[var(--background-200)]"
+											>
+												<Sparkles className="w-4 h-4 mr-3" />
+												Assistant
 											</Button>
 										</Link>
 									)}

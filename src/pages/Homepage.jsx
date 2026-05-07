@@ -3,11 +3,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { 
-	TrendingUp, 
-	BarChart3, 
-	Shield, 
-	Zap, 
+import {
+	TrendingUp,
+	BarChart3,
+	Shield,
+	Zap,
 	ArrowRight,
 	Play,
 	CheckCircle,
@@ -15,9 +15,7 @@ import {
 	Target,
 	Rocket,
 	ArrowUpRight,
-	Download,
-	Users,
-	Heart
+	Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -264,40 +262,6 @@ const Homepage = () => {
 			description: "Optimize your portfolio with data-driven strategies and risk management.",
 			color: "from-teal-500 to-cyan-500",
 			bgColor: "bg-teal-500/10"
-		}
-	];
-
-	const stats = [
-		{ value: "50K+", label: "Active Users", icon: <Users className="h-5 w-5" /> },
-		{ value: "1M+", label: "Stocks Tracked", icon: <TrendingUp className="h-5 w-5" /> },
-		{ value: "99.9%", label: "Uptime", icon: <Shield className="h-5 w-5" /> },
-		{ value: "24/7", label: "Support", icon: <Heart className="h-5 w-5" /> }
-	];
-
-	const testimonials = [
-		{
-			name: "Sarah Johnson",
-			role: "Portfolio Manager",
-			company: "Tech Investments",
-			content: "MarketPulse has transformed how I analyze markets. The real-time data and AI insights have given me a significant edge.",
-			rating: 5,
-			avatar: "SJ"
-		},
-		{
-			name: "Michael Chen",
-			role: "Day Trader",
-			company: "Independent",
-			content: "The lightning-fast performance and intuitive interface make it my go-to platform for market analysis.",
-			rating: 5,
-			avatar: "MC"
-		},
-		{
-			name: "Emily Rodriguez",
-			role: "Financial Analyst",
-			company: "Global Finance",
-			content: "The advanced analytics and smart watchlists have streamlined my workflow significantly.",
-			rating: 5,
-			avatar: "ER"
 		}
 	];
 
