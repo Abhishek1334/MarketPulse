@@ -60,7 +60,7 @@ const AssistantPage = () => {
 							MarketPulse Assistant
 						</h1>
 						<p className="text-sm text-[var(--text-600)] dark:text-[var(--text-300)]">
-							Ask about your portfolio, stocks, or market data. Powered by Claude via Vercel AI Gateway.
+							Ask about your portfolio, stocks, or market data. Powered by Gemini 2.5 Flash via the AI SDK.
 						</p>
 					</div>
 				</header>
