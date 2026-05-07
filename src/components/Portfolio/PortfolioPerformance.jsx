@@ -382,37 +382,37 @@ const PortfolioPerformance = () => {
 	const performanceStatus = getPerformanceStatus();
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50/30 dark:from-slate-900 dark:via-purple-900/20 dark:to-indigo-900/20 p-4 sm:p-6 lg:p-8 space-y-8">
-			{/* Hero Section */}
-			<div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 p-8 text-white shadow-2xl">
-				<div className="absolute inset-0 bg-black/10"></div>
-				<div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
-				<div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
-				
-				<div className="relative z-10">
-					<div className="flex items-center gap-3 mb-4">
-						<div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-							<Wallet className="w-6 h-6" />
+		<div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-4 sm:p-6 lg:p-8 space-y-8">
+			{/* Hero — editorial header, no purple */}
+			<div className="border-b border-[var(--border)] pb-8">
+				<div className="flex items-end justify-between gap-6 flex-wrap">
+					<div>
+						<div className="num text-[10px] uppercase tracking-[0.22em] text-[var(--text-subtle)] mb-3">
+							— Portfolio
 						</div>
-						<div>
-							<h1 className="text-3xl sm:text-4xl font-bold">Portfolio Dashboard</h1>
-							<p className="text-purple-100 text-lg">Track your investments and performance</p>
-						</div>
+						<h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight leading-[1.05]">
+							Track your investments
+							<br />
+							<span
+								className="italic font-light"
+								style={{ fontVariationSettings: "'opsz' 144, 'SOFT' 80, 'slnt' -8" }}
+							>
+								and performance.
+							</span>
+						</h1>
 					</div>
-					
-					<div className="flex flex-wrap items-center gap-4 mt-6">
-						<div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2">
-							<Sparkles className="w-4 h-4" />
-							<span className="text-sm font-medium">Total Value</span>
+					<div className="flex flex-col items-end gap-2">
+						<div className="num text-[10px] uppercase tracking-[0.22em] text-[var(--text-subtle)]">
+							Total value
 						</div>
-						<div className="text-2xl sm:text-3xl font-bold">
+						<div className="num text-3xl sm:text-4xl font-medium text-[var(--text)]">
 							${portfolio.performance.totalValue.toLocaleString()}
 						</div>
 						<div className={cn(
-							"flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium",
-							portfolio.performance.totalGain >= 0 
-								? "bg-green-500/20 text-green-100" 
-								: "bg-red-500/20 text-red-100"
+							"num inline-flex items-center gap-1 text-sm font-medium",
+							portfolio.performance.totalGain >= 0
+								? "text-[var(--gain)]"
+								: "text-[var(--loss)]"
 						)}>
 							{portfolio.performance.totalGain >= 0 ? (
 								<ArrowUpRight className="w-4 h-4" />
@@ -428,14 +428,14 @@ const PortfolioPerformance = () => {
 			{/* Quick Actions */}
 			<div className="flex flex-wrap items-center justify-between gap-4">
 				<div className="flex items-center gap-3">
-					<h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Portfolio Overview</h2>
-					<Badge variant="secondary" className="bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800">
-						{portfolio.holdings.length} Holdings
-					</Badge>
+					<h2 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight text-[var(--text)]">Overview</h2>
+					<span className="num text-xs uppercase tracking-[0.14em] text-[var(--text-subtle)] px-2.5 py-1 border border-[var(--border)]">
+						{portfolio.holdings.length} {portfolio.holdings.length === 1 ? "holding" : "holdings"}
+					</span>
 				</div>
 				<Button
 					onClick={() => setShowAddHolding(true)}
-					className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+					className="bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-fg)] shadow-none rounded-none px-6 py-2.5 text-sm font-semibold tracking-wide"
 				>
 					<Plus className="w-4 h-4 mr-2" />
 					Add Holding
@@ -444,131 +444,68 @@ const PortfolioPerformance = () => {
 
 			{/* Performance Cards */}
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-				{/* Total Value Card */}
-				<Card className="group relative overflow-hidden bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border-emerald-200 dark:border-emerald-800 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-					<div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-full -translate-y-10 translate-x-10"></div>
-					<CardHeader className="pb-3 relative z-10">
-						<div className="flex items-center justify-between">
-							<CardTitle className="text-emerald-800 dark:text-emerald-200 text-lg font-semibold">
-								Total Value
-							</CardTitle>
-							<div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-								<DollarSign className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-							</div>
-						</div>
-					</CardHeader>
-					<CardContent className="relative z-10">
-						<div className="text-3xl font-bold text-emerald-700 dark:text-emerald-300 mb-2">
-							${portfolio.performance.totalValue.toLocaleString()}
-						</div>
-						<div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-sm">
-							<TrendingUpIcon className="w-4 h-4" />
-							<span>Current portfolio value</span>
-						</div>
-					</CardContent>
-				</Card>
+				{/* Total Value */}
+				<div className="border border-[var(--border)] bg-[var(--surface)] p-6 hover:border-[var(--border-strong)] transition-colors">
+					<div className="num text-[10px] uppercase tracking-[0.18em] text-[var(--text-subtle)] mb-3">
+						Total Value
+					</div>
+					<div className="num text-3xl font-medium text-[var(--text)] mb-2">
+						${portfolio.performance.totalValue.toLocaleString()}
+					</div>
+					<div className="text-sm text-[var(--text-muted)]">
+						Current portfolio value
+					</div>
+				</div>
 
-				{/* Total Cost Card */}
-				<Card className="group relative overflow-hidden bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border-blue-200 dark:border-blue-800 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-					<div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 rounded-full -translate-y-10 translate-x-10"></div>
-					<CardHeader className="pb-3 relative z-10">
-						<div className="flex items-center justify-between">
-							<CardTitle className="text-blue-800 dark:text-blue-200 text-lg font-semibold">
-								Total Cost
-							</CardTitle>
-							<div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-								<Coins className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-							</div>
-						</div>
-					</CardHeader>
-					<CardContent className="relative z-10">
-						<div className="text-3xl font-bold text-blue-700 dark:text-blue-300 mb-2">
-							${portfolio.performance.totalCost.toLocaleString()}
-						</div>
-						<div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 text-sm">
-							<Target className="w-4 h-4" />
-							<span>Total amount invested</span>
-						</div>
-					</CardContent>
-				</Card>
+				{/* Total Cost */}
+				<div className="border border-[var(--border)] bg-[var(--surface)] p-6 hover:border-[var(--border-strong)] transition-colors">
+					<div className="num text-[10px] uppercase tracking-[0.18em] text-[var(--text-subtle)] mb-3">
+						Total Cost
+					</div>
+					<div className="num text-3xl font-medium text-[var(--text)] mb-2">
+						${portfolio.performance.totalCost.toLocaleString()}
+					</div>
+					<div className="text-sm text-[var(--text-muted)]">
+						Total amount invested
+					</div>
+				</div>
 
-				{/* Total Gain/Loss Card */}
-				<Card className={cn(
-					"group relative overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1",
-					portfolio.performance.totalGain >= 0 
-						? "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800"
-						: "bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-red-200 dark:border-red-800"
-				)}>
+				{/* Total Gain/Loss — semantic green/red kept ONLY for the number */}
+				<div className="border border-[var(--border)] bg-[var(--surface)] p-6 hover:border-[var(--border-strong)] transition-colors">
+					<div className="num text-[10px] uppercase tracking-[0.18em] text-[var(--text-subtle)] mb-3">
+						Total Gain/Loss
+					</div>
 					<div className={cn(
-						"absolute top-0 right-0 w-20 h-20 rounded-full -translate-y-10 translate-x-10",
-						portfolio.performance.totalGain >= 0 
-							? "bg-green-500/10" 
-							: "bg-red-500/10"
-					)}></div>
-					<CardHeader className="pb-3 relative z-10">
-						<div className="flex items-center justify-between">
-							<CardTitle className={cn(
-								"text-lg font-semibold",
-								portfolio.performance.totalGain >= 0 
-									? "text-green-800 dark:text-green-200"
-									: "text-red-800 dark:text-red-200"
-							)}>
-								Total Gain/Loss
-							</CardTitle>
-							<div className={cn(
-								"w-10 h-10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300",
-								portfolio.performance.totalGain >= 0 
-									? "bg-green-500/20" 
-									: "bg-red-500/20"
-							)}>
-								<performanceStatus.icon className={cn("h-5 w-5", performanceStatus.color)} />
-							</div>
-						</div>
-					</CardHeader>
-					<CardContent className="relative z-10">
-						<div className={cn(
-							"text-3xl font-bold mb-2",
-							portfolio.performance.totalGain >= 0 
-								? "text-green-700 dark:text-green-300"
-								: "text-red-700 dark:text-red-300"
-						)}>
-							${portfolio.performance.totalGain.toLocaleString()}
-						</div>
-						<div className={cn(
-							"flex items-center gap-2 text-sm",
-							portfolio.performance.totalGain >= 0 
-								? "text-green-600 dark:text-green-400"
-								: "text-red-600 dark:text-red-400"
-						)}>
-							<Percent className="w-4 h-4" />
-							<span>{portfolio.performance.totalGainPercent.toFixed(2)}% return</span>
-						</div>
-					</CardContent>
-				</Card>
+						"num text-3xl font-medium mb-2",
+						portfolio.performance.totalGain >= 0
+							? "text-[var(--gain)]"
+							: "text-[var(--loss)]"
+					)}>
+						{portfolio.performance.totalGain >= 0 ? "+" : ""}
+						${portfolio.performance.totalGain.toLocaleString()}
+					</div>
+					<div className={cn(
+						"num text-sm",
+						portfolio.performance.totalGain >= 0
+							? "text-[var(--gain)]"
+							: "text-[var(--loss)]"
+					)}>
+						{portfolio.performance.totalGainPercent.toFixed(2)}% return
+					</div>
+				</div>
 
-				{/* Holdings Count Card */}
-				<Card className="group relative overflow-hidden bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-200 dark:border-purple-800 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-					<div className="absolute top-0 right-0 w-20 h-20 bg-purple-500/10 rounded-full -translate-y-10 translate-x-10"></div>
-					<CardHeader className="pb-3 relative z-10">
-						<div className="flex items-center justify-between">
-							<CardTitle className="text-purple-800 dark:text-purple-200 text-lg font-semibold">
-								Holdings
-							</CardTitle>
-							<div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-								<ChartBar className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-							</div>
-						</div>
-					</CardHeader>
-					<CardContent className="relative z-10">
-						<div className="text-3xl font-bold text-purple-700 dark:text-purple-300 mb-2">
-							{portfolio.holdings.length}
-						</div>
-						<div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 text-sm">
-							<Star className="w-4 h-4" />
-							<span>Active positions</span>
-						</div>
-					</CardContent>
-				</Card>
+				{/* Holdings Count */}
+				<div className="border border-[var(--border)] bg-[var(--surface)] p-6 hover:border-[var(--border-strong)] transition-colors">
+					<div className="num text-[10px] uppercase tracking-[0.18em] text-[var(--text-subtle)] mb-3">
+						Holdings
+					</div>
+					<div className="num text-3xl font-medium text-[var(--text)] mb-2">
+						{portfolio.holdings.length}
+					</div>
+					<div className="text-sm text-[var(--text-muted)]">
+						Active positions
+					</div>
+				</div>
 			</div>
 
 			{/* Charts Section */}
