@@ -168,6 +168,32 @@ Frontend and backend live on the same domain. No CORS config, no two-host coordi
 
 ---
 
+## Screenshots
+
+### Light mode
+
+| Homepage | Dashboard | Portfolio |
+| --- | --- | --- |
+| ![Homepage](./screenshots/Homepage_Light.png) | ![Dashboard](./screenshots/Dashboard_Light.png) | ![Portfolio](./screenshots/Portfolio1_Light.png) |
+
+| Analytics | Watchlist | Assistant |
+| --- | --- | --- |
+| ![Analytics](./screenshots/Analytics1_Light.png) | ![Watchlist](./screenshots/Watchlist_Light.png) | ![Assistant](./screenshots/Assistant_Light.png) |
+
+### Dark mode
+
+| Homepage | Dashboard | Portfolio |
+| --- | --- | --- |
+| ![Homepage](./screenshots/Homapage_Dark.png) | ![Dashboard](./screenshots/Dashboard_Dark.png) | ![Portfolio](./screenshots/Portfolio1_Dark.png) |
+
+| Analytics | Watchlist | Assistant |
+| --- | --- | --- |
+| ![Analytics](./screenshots/Analytics1_Dark.png) | ![Watchlist](./screenshots/Watchlist_Dark.png) | ![Assistant](./screenshots/Assistant_Dark.png) |
+
+Full set in [`/screenshots`](./screenshots).
+
+---
+
 ## What I'd do differently next time
 
 - **TypeScript from day one.** Most defects in this repo were prop-shape or response-shape mismatches that TS would have caught.
