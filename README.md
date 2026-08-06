@@ -2,7 +2,7 @@
 
 A focused stock-tracking SPA built as a portfolio piece. Watchlists, a real-price portfolio, interactive charts, and a Gemini-powered assistant grounded in the user's actual data.
 
-**Live:** [market-pulse-two.vercel.app](https://market-pulse-two.vercel.app/) · **Source:** [github.com/Abhishek1334/MarketPulse](https://github.com/Abhishek1334/MarketPulse)
+**Live:** [market-pulse-two.vercel.app](https://market-pulse-two.vercel.app/) · **Source:** [github.com/AbhishekRajoria/MarketPulse](https://github.com/AbhishekRajoria/MarketPulse)
 
 ![Homepage](./screenshots/Homepage_Light.png)
 
@@ -21,7 +21,7 @@ A focused stock-tracking SPA built as a portfolio piece. Watchlists, a real-pric
 
 ## What's worth your 60 seconds
 
-**Single-Function backend that *isn't* Next.js.** Vercel's `api/[...slug]` catch-all is a Next.js convention; it deploys as a Function on a Vite project but never receives `/api/*` traffic. The bulletproof pattern that does work: a single `api/index.js` + a `vercel.json` rewrite that forwards `/api/:path*` to `/api?__path=:path*`, with the handler reconstructing `req.url` before invoking Express. Discovered by deploying it wrong four times. ([commit](https://github.com/Abhishek1334/MarketPulse/commit/dcd6cba))
+**Single-Function backend that *isn't* Next.js.** Vercel's `api/[...slug]` catch-all is a Next.js convention; it deploys as a Function on a Vite project but never receives `/api/*` traffic. The bulletproof pattern that does work: a single `api/index.js` + a `vercel.json` rewrite that forwards `/api/:path*` to `/api?__path=:path*`, with the handler reconstructing `req.url` before invoking Express. Discovered by deploying it wrong four times. ([commit](https://github.com/AbhishekRajoria/MarketPulse/commit/dcd6cba))
 
 **Mongoose connection caching for serverless.** Each warm Function invocation reuses a cached connection on `globalThis._mongooseCache`. Without this, Atlas blocks the deployment within minutes. ([server/db.js](./server/db.js))
 
@@ -135,7 +135,7 @@ Full set in [`/screenshots`](./screenshots).
 Requires Node 20+ and a MongoDB connection string.
 
 ```bash
-git clone git@github.com:Abhishek1334/MarketPulse.git
+git clone git@github.com:AbhishekRajoria/MarketPulse.git
 cd MarketPulse
 npm install
 cd server && npm install && cd ..
@@ -211,6 +211,6 @@ These are the lessons that cost an hour or more apiece. Saved here so the next p
 
 ## Contact
 
-- GitHub: [@Abhishek1334](https://github.com/Abhishek1334)
+- GitHub: [@AbhishekRajoria](https://github.com/AbhishekRajoria)
 - LinkedIn: [Abhishek Rajoria](https://linkedin.com/in/AbhishekRajoria)
 - Email: AbhishekRajoria24@gmail.com
