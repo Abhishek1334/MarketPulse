@@ -52,3 +52,6 @@ playwright/.cache/
 !public/**
 !screenshots/**
 
+
+# Seed/test account credentials
+SEED_ACCOUNTS.txt
