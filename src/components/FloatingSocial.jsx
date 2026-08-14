@@ -8,7 +8,7 @@ const FloatingSocial = () => {
 		{
 			name: "GitHub",
 			icon: <Github className="w-5 h-5 text-[var(--primary-500)] dark:text-[var(--primary-400)]" />,
-			url: "https://github.com/Abhishek1334/",
+			url: "https://github.com/AbhishekRajoria/",
 			color: "hover:bg-[var(--background-700)] hover:text-[var(--text-50)] dark:hover:bg-[var(--background-600)]",
 			bgColor: "bg-[var(--background-100)] dark:bg-[var(--background-200)]",
 			borderColor: "border-[var(--background-300)] dark:border-[var(--background-400)]"

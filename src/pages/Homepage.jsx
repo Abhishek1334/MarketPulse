@@ -244,7 +244,7 @@ const Homepage = () => {
 							<ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
 						</button>
 						<a
-							href="https://github.com/Abhishek1334/MarketPulse"
+							href="https://github.com/AbhishekRajoria/MarketPulse"
 							target="_blank"
 							rel="noreferrer"
 							className="reveal group inline-flex items-center justify-center gap-2 px-7 py-4 text-sm font-semibold tracking-wide text-[var(--text)] border border-[var(--border-strong)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors"
@@ -262,7 +262,7 @@ const Homepage = () => {
 					<div className="num">
 						MarketPulse · v1.0 · built by{" "}
 						<a
-							href="https://github.com/Abhishek1334"
+							href="https://github.com/AbhishekRajoria"
 							target="_blank"
 							rel="noreferrer"
 							className="text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors underline-offset-4 hover:underline"
@@ -271,7 +271,7 @@ const Homepage = () => {
 						</a>
 					</div>
 					<a
-						href="https://github.com/Abhishek1334/MarketPulse"
+						href="https://github.com/AbhishekRajoria/MarketPulse"
 						target="_blank"
 						rel="noreferrer"
 						className="inline-flex items-center gap-2 hover:text-[var(--accent)] transition-colors"
